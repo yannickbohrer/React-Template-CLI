@@ -1,4 +1,3 @@
-#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -28,7 +27,7 @@ void CLI::Executor::MatchActivity(const std::string& arg) {
         m_Activity = CLI::Activity::GENERATE;
 
     if (std::holds_alternative<std::monostate>(m_Activity))
-        CLI::ErrorHandler error(CLI::Error::ILLEGAL_ACTIVITY);
+        CLI::ErrorHandler error(CLI::Error::INVALID_ACTIVITY);
 }
 
 void CLI::Executor::MatchType(const std::string& arg) {
@@ -36,7 +35,7 @@ void CLI::Executor::MatchType(const std::string& arg) {
         m_Type = CLI::Type::COMPONENT;
 
     if (std::holds_alternative<std::monostate>(m_Type))
-        CLI::ErrorHandler error(CLI::Error::ILLEGAL_TYPE);
+        CLI::ErrorHandler error(CLI::Error::INVALID_TYPE);
 }
 
 std::string CLI::Executor::ExtractName() const {
@@ -47,68 +46,71 @@ std::string CLI::Executor::ExtractName() const {
 }
 
 void CLI::Executor::Execute() {
+    const auto* activity = std::get_if<CLI::Activity>(&m_Activity);
+
+    if (!activity)
+        CLI::ErrorHandler error(CLI::Error::UNKNOWN);
+
+    switch (*activity) {
+        case CLI::Activity::GENERATE:
+            Generate();
+            break;
+        default:
+            CLI::ErrorHandler error(CLI::Error::UNKNOWN);
+    }
+}
+
+void CLI::Executor::Generate() {
+    const auto* type = std::get_if<CLI::Type>(&m_Type);
+
+    if (!type)
+        CLI::ErrorHandler error(CLI::Error::UNKNOWN);
+
+    switch (*type) {
+        case CLI::Type::COMPONENT:
+            GenerateComponent();
+            break;
+        default:
+            CLI::ErrorHandler error(CLI::Error::UNKNOWN);
+    }
+}
+
+void CLI::Executor::ApplyTemplate(std::fstream& from, std::fstream& to) const {
+    std::string line;
+    while (std::getline(from, line)) {
+        for (const char c : line) {
+            if (c == '%')
+                to << m_Name;
+            else
+                to << c;
+        }
+        to << '\n';
+    }
+    from.close();
+    to.close();
+}
+
+void CLI::Executor::GenerateComponent() {
+    bool css = false;
+
     m_Name = ExtractName();
     std::fstream componentFile("./" + m_Path + ".jsx", std::ios::out);
     std::fstream componentTestFile("./" + m_Path + ".test.js", std::ios::out);
-    std::fstream componentStylesFile("./" + m_Path + ".css", std::ios::out);
 
     std::fstream componentTemplate;
     componentTemplate.open(CLI::Config::assetsDir + "/component-js.txt", std::ios::in);
-    
+
     std::fstream componentTestTemplate;
     componentTestTemplate.open(CLI::Config::assetsDir + "/component-test-js.txt", std::ios::in);
-    
-    std::fstream componentStylesTemplate;
-    componentStylesTemplate.open(CLI::Config::assetsDir + "/component-styles-css.txt", std::ios::in);
 
+    ApplyTemplate(componentTemplate, componentFile);
+    ApplyTemplate(componentTestTemplate, componentTestFile);
 
-    std::string line;
-    while (std::getline(componentTemplate, line)) {
-        for (const char c : line) {
-            if (c == '%')
-                componentFile << m_Name;
-            else
-                componentFile << c;
-        }
-        componentFile << '\n';
+    if (css) {
+        std::fstream componentStylesFile("./" + m_Path + ".css", std::ios::out);
+        std::fstream componentStylesTemplate;
+        componentStylesTemplate.open(CLI::Config::assetsDir + "/component-styles-css.txt",
+                                     std::ios::in);
+        ApplyTemplate(componentStylesTemplate, componentStylesFile);
     }
-    componentTemplate.close();
-    componentFile.close();
-
-    line = "";
-    while (std::getline(componentTestTemplate, line)) {
-        for (const char c : line) {
-            if (c == '%')
-                componentTestFile << m_Name;
-            else
-                componentTestFile << c;
-        }
-        componentTestFile << '\n';
-    }
-    componentTestTemplate.close();
-    componentTestFile.close();
-
-    line = "";
-    while (std::getline(componentStylesTemplate, line)) {
-        for (const char c : line) {
-            if (c == '%')
-                componentStylesFile << m_Name;
-            else
-                componentStylesFile << c;
-        }
-        componentStylesFile << '\n';
-    }
-    componentStylesTemplate.close();
-    componentStylesFile.close();
 }
-
-
-
-
-
-
-
-
-
-
-

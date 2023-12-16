@@ -17,8 +17,9 @@ inline const std::string assetsDir = "/usr/local/share/react-cli/assets/template
 
 enum class Error {
     NOT_ENOUGH_ARGUMENTS,
-    ILLEGAL_ACTIVITY,
-    ILLEGAL_TYPE,
+    INVALID_ACTIVITY,
+    INVALID_TYPE,
+    UNKNOWN,
 };
 
 enum class Activity {
