@@ -14,4 +14,6 @@ sudo make install
 ```
 
 ### usage
+```bash
 react-cli generate component MyComponent
+```
