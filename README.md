@@ -1,7 +1,7 @@
 # react-cli
 
 ### requirements
-- cmake standard: 3.25
+- cmake standard >= 3.25
 
 ### install
 1. clone repo
