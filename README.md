@@ -4,7 +4,7 @@
 - cmake standard >= 3.25
 
 ### install
-```
+```bash
 clone repo
 cd react-cli
 cmake -S ./ -B build/
