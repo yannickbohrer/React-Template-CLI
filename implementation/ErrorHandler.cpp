@@ -14,12 +14,19 @@ CLI::ErrorHandler::ErrorHandler(CLI::Error err) {
             syntaxErr = true;
             break;
         case CLI::Error::INVALID_ACTIVITY:
-            std::cerr << "Illegal activity:\n";
+            std::cerr << "Invalid activity\n";
             syntaxErr = true;
             break;
         case CLI::Error::INVALID_TYPE:
-            std::cerr << "Illegal type\n";
+            std::cerr << "Invalid type\n";
             syntaxErr = true;
+            break;
+        case CLI::Error::INVALID_FILE_PATH:
+            std::cerr << "File not found: " << exec.FilePath() << exec.FileName() << "\n";
+            break;
+        case CLI::Error::INSUFFICIENT_PERMISSIONS:
+            std::cerr << "Insufficient Permissions!\n"
+                << "Fix suggestion: Execute react-cli with superuser privileges\n";
             break;
         case CLI::Error::UNKNOWN:
         default:

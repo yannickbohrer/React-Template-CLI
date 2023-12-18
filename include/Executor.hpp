@@ -10,16 +10,24 @@ class CLI::Executor {
 public:
     static Executor& Get();
     static void Run(const char*[]);
+    
+    std::string FilePath() const;
+    std::string FileName() const;
 
 private:
     void MatchActivity(const std::string&);
     void MatchType(const std::string&);
+    std::tuple<std::string, std::string> SplitPathAndName() const;
     void Execute();
     void ApplyTemplate(std::fstream&, std::fstream&) const;
+    void GenerateTemplate(std::fstream&, std::fstream&) const;
 
     void Generate();
     void GenerateComponent();
-    std::tuple<std::string, std::string> SplitPathAndName() const;
+
+    void Add();
+    void AddTemplateFile();
+    std::string ExtractComponentName() const;
 
     Executor();
     Executor(const Executor&) = delete;

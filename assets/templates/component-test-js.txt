@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
-import % from '../%';
+import %Component from '../%Component';
 
 test('should render', () => {
-  render(<% />);
+  render(<%Component />);
 });

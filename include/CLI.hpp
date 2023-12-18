@@ -6,28 +6,37 @@
 namespace CLI {
 
 namespace Tokens {
+// Activities
 inline const std::string generate = "generate";
+inline const std::string add = "add";
 
+// Types
 inline const std::string component = "component";
+inline const std::string file = "file";
 }  // namespace Tokens
 
 namespace Config {
-inline const std::string assetsDir = "/usr/local/share/react-cli/assets/templates";
+inline const std::string assetsDir = "/usr/local/share/react-cli/assets/templates/";
+inline const std::string customAssetsDir = "/usr/local/share/react-cli/assets/templates/custom/";
 }  // namespace Config
 
 enum class Error {
     NOT_ENOUGH_ARGUMENTS,
     INVALID_ACTIVITY,
     INVALID_TYPE,
+    INVALID_FILE_PATH,
+    INSUFFICIENT_PERMISSIONS,
     UNKNOWN,
 };
 
 enum class Activity {
     GENERATE,
+    ADD,
 };
 
 enum class Type {
     COMPONENT,
+    FILE,
 };
 
 class Executor;
