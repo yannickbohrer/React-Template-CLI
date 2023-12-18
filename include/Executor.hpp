@@ -2,6 +2,7 @@
 #define EXECUTOR_HPP
 
 #include <string>
+#include <tuple>
 #include <variant>
 #include "CLI.hpp"
 
@@ -18,7 +19,7 @@ private:
 
     void Generate();
     void GenerateComponent();
-    std::string ExtractName() const;
+    std::tuple<std::string, std::string> SplitPathAndName() const;
 
     Executor();
     Executor(const Executor&) = delete;

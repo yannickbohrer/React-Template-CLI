@@ -1,6 +1,8 @@
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <tuple>
 #include <variant>
 
 #include "../include/CLI.hpp"
@@ -38,11 +40,11 @@ void CLI::Executor::MatchType(const std::string& arg) {
         CLI::ErrorHandler error(CLI::Error::INVALID_TYPE);
 }
 
-std::string CLI::Executor::ExtractName() const {
-    size_t found = m_Path.find_last_of('/');
-    if (found != std::string::npos)
-        return m_Path.substr(found + 1);
-    return m_Path;
+std::tuple<std::string, std::string> CLI::Executor::SplitPathAndName() const {
+    size_t pos = m_Path.find_last_of('/');
+    if (pos != std::string::npos)
+        return std::tuple(m_Path.substr(0, pos + 1), m_Path.substr(pos + 1));
+    return std::tuple("", m_Path);
 }
 
 void CLI::Executor::Execute() {
@@ -93,9 +95,15 @@ void CLI::Executor::ApplyTemplate(std::fstream& from, std::fstream& to) const {
 void CLI::Executor::GenerateComponent() {
     bool css = false;
 
-    m_Name = ExtractName();
-    std::fstream componentFile("./" + m_Path + ".jsx", std::ios::out);
-    std::fstream componentTestFile("./" + m_Path + ".test.js", std::ios::out);
+    const auto pathAndName = SplitPathAndName();
+    m_Path = std::get<0>(pathAndName);
+    m_Name = std::get<1>(pathAndName);
+    std::cout << "path: " << m_Path << "\n"; 
+    std::cout << "name: " << m_Name << "\n"; 
+
+    std::filesystem::create_directory(m_Path);
+    std::fstream componentFile(m_Path + m_Name + ".jsx", std::ios::out);
+    std::fstream componentTestFile(m_Path + m_Name + ".test.js", std::ios::out);
 
     std::fstream componentTemplate;
     componentTemplate.open(CLI::Config::assetsDir + "/component-js.txt", std::ios::in);
@@ -107,7 +115,7 @@ void CLI::Executor::GenerateComponent() {
     ApplyTemplate(componentTestTemplate, componentTestFile);
 
     if (css) {
-        std::fstream componentStylesFile("./" + m_Path + ".css", std::ios::out);
+        std::fstream componentStylesFile(m_Path + m_Name + ".css", std::ios::out);
         std::fstream componentStylesTemplate;
         componentStylesTemplate.open(CLI::Config::assetsDir + "/component-styles-css.txt",
                                      std::ios::in);
