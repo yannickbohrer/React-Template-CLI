@@ -15,5 +15,5 @@ sudo make install
 
 ### usage
 ```bash
-react-cli generate component MyComponent
+react-cli generate component path/to/MyComponent
 ```

@@ -98,8 +98,6 @@ void CLI::Executor::GenerateComponent() {
     const auto pathAndName = SplitPathAndName();
     m_Path = std::get<0>(pathAndName);
     m_Name = std::get<1>(pathAndName);
-    std::cout << "path: " << m_Path << "\n"; 
-    std::cout << "name: " << m_Name << "\n"; 
 
     std::filesystem::create_directory(m_Path);
     std::fstream componentFile(m_Path + m_Name + ".jsx", std::ios::out);
