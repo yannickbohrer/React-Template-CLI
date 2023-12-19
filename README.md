@@ -17,5 +17,5 @@ sudo make install
 ```bash
 react-cli generate component path/to/MyComponent
 
-sudo react-cli add file path/to/MyExistingFile
+react-cli add template path/to/MyExistingFile
 ```

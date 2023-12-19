@@ -47,8 +47,8 @@ void CLI::Executor::MatchActivity(const std::string& arg) {
 void CLI::Executor::MatchType(const std::string& arg) {
     if (arg == CLI::Tokens::component)
         m_Type = CLI::Type::COMPONENT;
-    else if (arg == CLI::Tokens::file)
-        m_Type = CLI::Type::FILE;
+    else if (arg == CLI::Tokens::fileTemplate)
+        m_Type = CLI::Type::TEMPLATE;
 
     if (std::holds_alternative<std::monostate>(m_Type))
         CLI::ErrorHandler error(CLI::Error::INVALID_TYPE);
@@ -125,7 +125,7 @@ void CLI::Executor::Generate() {
             GenerateComponent();
             break;
         default:
-            CLI::ErrorHandler error(CLI::Error::UNKNOWN);
+            CLI::ErrorHandler error(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
     }
 }
 
@@ -161,11 +161,11 @@ void CLI::Executor::Add() {
         CLI::ErrorHandler error(CLI::Error::UNKNOWN);
 
     switch (*type) {
-        case CLI::Type::FILE:
+        case CLI::Type::TEMPLATE:
             AddTemplateFile();
             break;
         default:
-            CLI::ErrorHandler error(CLI::Error::UNKNOWN);
+            CLI::ErrorHandler error(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
     }
 }
 

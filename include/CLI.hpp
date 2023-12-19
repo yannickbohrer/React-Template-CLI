@@ -12,7 +12,7 @@ inline const std::string add = "add";
 
 // Types
 inline const std::string component = "component";
-inline const std::string file = "file";
+inline const std::string fileTemplate = "template";
 }  // namespace Tokens
 
 namespace Config {
@@ -25,6 +25,7 @@ enum class Error {
     INVALID_ACTIVITY,
     INVALID_TYPE,
     INVALID_FILE_PATH,
+    INVALID_TYPE_FOR_ACTIVITY,
     INSUFFICIENT_PERMISSIONS,
     UNKNOWN,
 };
@@ -36,7 +37,7 @@ enum class Activity {
 
 enum class Type {
     COMPONENT,
-    FILE,
+    TEMPLATE,
 };
 
 class Executor;

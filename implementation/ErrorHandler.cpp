@@ -21,6 +21,10 @@ CLI::ErrorHandler::ErrorHandler(CLI::Error err) {
             std::cerr << "Invalid type\n";
             syntaxErr = true;
             break;
+        case CLI::Error::INVALID_TYPE_FOR_ACTIVITY:
+            std::cerr << "Activity and type are not compatible\n";
+            syntaxErr = true;
+            break;
         case CLI::Error::INVALID_FILE_PATH:
             std::cerr << "File not found: " << exec.FilePath() << exec.FileName() << "\n";
             break;
