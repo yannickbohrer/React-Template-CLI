@@ -16,4 +16,6 @@ sudo make install
 ### usage
 ```bash
 react-cli generate component path/to/MyComponent
+
+sudo react-cli add file path/to/MyExistingFile
 ```
