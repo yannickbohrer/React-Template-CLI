@@ -9,7 +9,7 @@
 class CLI::Executor {
 public:
     static Executor& Get();
-    static void Run(const char*[]);
+    static void Run(const int, const char*[]);
     
     std::string FilePath() const;
     std::string FileName() const;
@@ -32,6 +32,9 @@ private:
     void Remove();
     void RemoveTemplateFile();
     bool IsCustomTemplate() const;
+
+    void List() const;
+    void ListCustomTemplateFiles() const;
 
     Executor();
     Executor(const Executor&) = delete;

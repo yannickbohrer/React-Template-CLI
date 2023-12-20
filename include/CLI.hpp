@@ -10,6 +10,7 @@ namespace Tokens {
 inline const std::string generate = "generate";
 inline const std::string add = "add";
 inline const std::string remove = "remove";
+inline const std::string list = "list";
 
 // Types
 inline const std::string component = "component";
@@ -29,6 +30,7 @@ enum class Error {
     INVALID_TYPE_FOR_ACTIVITY,
     INSUFFICIENT_PERMISSIONS,
     SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE,
+    NO_CUSTOM_TEMPLATES_FOUND,
     UNKNOWN,
 };
 
@@ -36,6 +38,7 @@ enum class Activity {
     GENERATE,
     ADD,
     REMOVE,
+    LIST,
 };
 
 enum class Type {

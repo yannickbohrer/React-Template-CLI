@@ -10,7 +10,7 @@ CLI::ErrorHandler::ErrorHandler(CLI::Error err) {
     bool syntaxErr = false;
     switch (err) {
         case CLI::Error::NOT_ENOUGH_ARGUMENTS:
-            std::cerr << "Not enough arguments! 3 args required\n";
+            std::cerr << "Not enough arguments! Minimum: 2 args required\n";
             syntaxErr = true;
             break;
         case CLI::Error::INVALID_ACTIVITY:
@@ -33,8 +33,12 @@ CLI::ErrorHandler::ErrorHandler(CLI::Error err) {
                 << "Fix available: Execute react-cli with superuser privileges\n";
             break;
         case CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE:
-            std::cerr << "Requested file is not a custom template.\n"
+            std::cerr << "Requested file is not a custom template\n"
                 << "Call 'react-cli list template' for information on existing template files\n";
+            break;
+        case CLI::Error::NO_CUSTOM_TEMPLATES_FOUND:
+            std::cerr << "Custom templated directory is empty\n"
+                << "Use 'react-cli generate template path/to/MyExistingFile' to generate custom templates\n";
             break;
         case CLI::Error::UNKNOWN:
         default:

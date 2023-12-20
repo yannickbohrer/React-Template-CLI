@@ -18,11 +18,12 @@ CLI::Executor& CLI::Executor::Get() {
     return m_Instance;
 }
 
-void CLI::Executor::Run(const char* argv[]) {
+void CLI::Executor::Run(const int argc, const char* argv[]) {
     auto& cli = CLI::Executor::Get();
     cli.MatchActivity(std::string(argv[1]));
     cli.MatchType(std::string(argv[2]));
-    cli.m_Path = argv[3];
+    if (argc > 3)
+        cli.m_Path = argv[3];
     cli.Execute();
 }
 
@@ -41,6 +42,8 @@ void CLI::Executor::MatchActivity(const std::string& arg) {
         m_Activity = CLI::Activity::ADD;
     else if (arg == CLI::Tokens::remove)
         m_Activity = CLI::Activity::REMOVE;
+    else if (arg == CLI::Tokens::list)
+        m_Activity = CLI::Activity::LIST;
 
     if (std::holds_alternative<std::monostate>(m_Activity))
         CLI::ErrorHandler error(CLI::Error::INVALID_ACTIVITY);
@@ -86,6 +89,11 @@ void CLI::Executor::Execute() {
             if (geteuid() != 0)
                 CLI::ErrorHandler error(CLI::Error::INSUFFICIENT_PERMISSIONS);
             Remove();
+            break;
+        case CLI::Activity::LIST:
+            if (geteuid() != 0)
+                CLI::ErrorHandler error(CLI::Error::INSUFFICIENT_PERMISSIONS);
+            List();
             break;
         default:
             CLI::ErrorHandler error(CLI::Error::UNKNOWN);
@@ -223,7 +231,39 @@ void CLI::Executor::RemoveTemplateFile() {
         CLI::ErrorHandler error(CLI::Error::UNKNOWN);
 }
 
+void CLI::Executor::List() const {
+    const auto* type = std::get_if<CLI::Type>(&m_Type);
+    if (!type)
+        CLI::ErrorHandler error(CLI::Error::UNKNOWN);
 
+    switch (*type) {
+        case CLI::Type::TEMPLATE:
+            ListCustomTemplateFiles();
+            break;
+        default:
+            CLI::ErrorHandler error(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
+    }
+}
+
+void CLI::Executor::ListCustomTemplateFiles() const {
+    std::cout << "react-cli provided templates:\n";
+    for (const auto& file : std::filesystem::directory_iterator(CLI::Config::assetsDir)) {
+        if (file.is_directory())
+            continue;
+        std::string path = std::string(file.path());
+        std::string name = path.substr(path.find_last_of("/") + 1);
+        std::cout << "\t- " << name << "\n";
+    }
+    std::cout << std::endl;
+    if (std::filesystem::is_empty(CLI::Config::customAssetsDir))
+        CLI::ErrorHandler error(CLI::Error::NO_CUSTOM_TEMPLATES_FOUND);
+    std::cout << "Custom file templates:\n";
+    for (const auto& file : std::filesystem::directory_iterator(CLI::Config::customAssetsDir)) {
+        std::string path = std::string(file.path());
+        std::string name = path.substr(path.find_last_of("/") + 1);
+        std::cout << "\t- " << name << "\n";
+    }
+}
 
 
 
