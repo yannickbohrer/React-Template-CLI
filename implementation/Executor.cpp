@@ -117,12 +117,11 @@ void CLI::Executor::ApplyTemplate(std::fstream& from, std::fstream& to) const {
 
 void CLI::Executor::GenerateTemplate(std::fstream& from, std::fstream& to) const {
     const std::string componentName = ExtractComponentName();
-    const std::string componentSuffix = "Component";
     std::string line;
     while (std::getline(from, line)) {
         const std::size_t pos = line.find(componentName);
         if (pos != std::string::npos)
-            line.replace(pos, componentName.length(), "%" + componentSuffix);
+            line.replace(pos, componentName.length(), "%");
         to << line << '\n';
     }
     from.close();
@@ -145,10 +144,11 @@ void CLI::Executor::Generate() {
 
 void CLI::Executor::GenerateComponent() {
     bool css = false;
+    GenerateRequiredDirectories();
+    std::filesystem::create_directory(m_Path + "tests/");
 
-    std::filesystem::create_directory(m_Path);
     std::fstream componentFile(m_Path + m_Name + ".jsx", std::ios::out);
-    std::fstream componentTestFile(m_Path + m_Name + ".test.js", std::ios::out);
+    std::fstream componentTestFile(m_Path + "tests/" + m_Name + ".test.js", std::ios::out);
 
     std::fstream componentTemplate;
     componentTemplate.open(CLI::Config::assetsDir + "component-js.txt", std::ios::in);
@@ -165,6 +165,22 @@ void CLI::Executor::GenerateComponent() {
         componentStylesTemplate.open(CLI::Config::assetsDir + "component-styles-css.txt",
                                      std::ios::in);
         ApplyTemplate(componentStylesTemplate, componentStylesFile);
+    }
+}
+
+void CLI::Executor::GenerateRequiredDirectories() const {
+    if (!m_Path.empty() && m_Path != "./" && m_Path != "/") {
+        int itL = 0, itR = 0;
+        std::string lastDir = "";
+        while (itR < m_Path.length()) {
+            if (m_Path.at(itR) == '/') {
+                std::string nextDir = m_Path.substr(itL, itR - itL);
+                std::filesystem::create_directory(lastDir + nextDir);
+                lastDir += nextDir + '/';
+                itL = itR + 1;
+            }
+            itR++;
+        }
     }
 }
 
@@ -264,14 +280,3 @@ void CLI::Executor::ListCustomTemplateFiles() const {
         std::cout << "\t- " << name << "\n";
     }
 }
-
-
-
-
-
-
-
-
-
-
-

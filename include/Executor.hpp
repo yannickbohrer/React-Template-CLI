@@ -24,6 +24,7 @@ private:
 
     void Generate();
     void GenerateComponent();
+    void GenerateRequiredDirectories() const;
 
     void Add();
     void AddTemplateFile();

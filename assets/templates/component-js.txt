@@ -1,4 +1,4 @@
-export function %Component () {
+export function %() {
     return (
         <>
             <h1>% Works</h1>
@@ -6,4 +6,4 @@ export function %Component () {
     )
 }
 
-export default %Component
+export default %
