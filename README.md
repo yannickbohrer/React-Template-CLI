@@ -1,9 +1,9 @@
 # react-cli
 
-### requirements
+### Requirements
 - cmake standard >= 3.25
 
-### install
+### Install
 ```bash
 clone repo
 cd react-cli
@@ -13,9 +13,15 @@ make
 sudo make install
 ```
 
-### usage
-```bash
-react-cli generate component path/to/MyComponent
+### Commands
+- `react-cli generate component path/to/MyComponent`
+- `react-cli add template path/to/MyExistingFile`
+- `react-cli remove template MyTemplate`
+- `react-cli list template`
 
-react-cli add template path/to/MyExistingFile
+note: template related calls require superuser permissions since they modify the installation directory
+
+### Custom template directory:
+```bash
+/usr/local/share/react-cli/assets/templates/custom/
 ```
