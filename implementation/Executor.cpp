@@ -39,6 +39,8 @@ void CLI::Executor::MatchActivity(const std::string& arg) {
         m_Activity = CLI::Activity::GENERATE;
     else if (arg == CLI::Tokens::add)
         m_Activity = CLI::Activity::ADD;
+    else if (arg == CLI::Tokens::remove)
+        m_Activity = CLI::Activity::REMOVE;
 
     if (std::holds_alternative<std::monostate>(m_Activity))
         CLI::ErrorHandler error(CLI::Error::INVALID_ACTIVITY);
@@ -80,6 +82,11 @@ void CLI::Executor::Execute() {
                 CLI::ErrorHandler error(CLI::Error::INSUFFICIENT_PERMISSIONS);
             Add();
             break;
+        case CLI::Activity::REMOVE:
+            if (geteuid() != 0)
+                CLI::ErrorHandler error(CLI::Error::INSUFFICIENT_PERMISSIONS);
+            Remove();
+            break;
         default:
             CLI::ErrorHandler error(CLI::Error::UNKNOWN);
     }
@@ -116,7 +123,6 @@ void CLI::Executor::GenerateTemplate(std::fstream& from, std::fstream& to) const
 
 void CLI::Executor::Generate() {
     const auto* type = std::get_if<CLI::Type>(&m_Type);
-
     if (!type)
         CLI::ErrorHandler error(CLI::Error::UNKNOWN);
 
@@ -156,7 +162,6 @@ void CLI::Executor::GenerateComponent() {
 
 void CLI::Executor::Add() {
     const auto* type = std::get_if<CLI::Type>(&m_Type);
-
     if (!type)
         CLI::ErrorHandler error(CLI::Error::UNKNOWN);
 
@@ -182,3 +187,51 @@ void CLI::Executor::AddTemplateFile() {
 std::string CLI::Executor::ExtractComponentName() const {
     return m_Name.substr(0, m_Name.find_last_of("."));
 }
+
+void CLI::Executor::Remove() {
+    if (m_Path != "" && m_Path != CLI::Config::customAssetsDir)
+        CLI::ErrorHandler error(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
+    if (!IsCustomTemplate())
+        CLI::ErrorHandler error(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
+
+    const auto* type = std::get_if<CLI::Type>(&m_Type);
+    if (!type)
+        CLI::ErrorHandler error(CLI::Error::UNKNOWN);
+
+    switch (*type) {
+        case CLI::Type::TEMPLATE:
+            RemoveTemplateFile();
+            break;
+        default:
+            CLI::ErrorHandler error(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
+    }
+}
+
+bool CLI::Executor::IsCustomTemplate() const {
+    bool result = false;
+    for (const auto& file : std::filesystem::directory_iterator(CLI::Config::customAssetsDir)) {
+        std::string path = std::string(file.path());
+        std::string name = path.substr(path.find_last_of("/") + 1);
+        if (name == m_Name)
+            result = true;
+    }
+    return result;
+}
+
+void CLI::Executor::RemoveTemplateFile() {
+    if (std::remove((CLI::Config::customAssetsDir + m_Name).c_str()) != 0)
+        CLI::ErrorHandler error(CLI::Error::UNKNOWN);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -30,7 +30,11 @@ CLI::ErrorHandler::ErrorHandler(CLI::Error err) {
             break;
         case CLI::Error::INSUFFICIENT_PERMISSIONS:
             std::cerr << "Insufficient Permissions!\n"
-                << "Fix suggestion: Execute react-cli with superuser privileges\n";
+                << "Fix available: Execute react-cli with superuser privileges\n";
+            break;
+        case CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE:
+            std::cerr << "Requested file is not a custom template.\n"
+                << "Call 'react-cli list template' for information on existing template files\n";
             break;
         case CLI::Error::UNKNOWN:
         default:

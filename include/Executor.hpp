@@ -29,6 +29,10 @@ private:
     void AddTemplateFile();
     std::string ExtractComponentName() const;
 
+    void Remove();
+    void RemoveTemplateFile();
+    bool IsCustomTemplate() const;
+
     Executor();
     Executor(const Executor&) = delete;
     static Executor m_Instance;

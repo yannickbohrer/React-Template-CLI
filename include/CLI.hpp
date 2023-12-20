@@ -9,6 +9,7 @@ namespace Tokens {
 // Activities
 inline const std::string generate = "generate";
 inline const std::string add = "add";
+inline const std::string remove = "remove";
 
 // Types
 inline const std::string component = "component";
@@ -27,12 +28,14 @@ enum class Error {
     INVALID_FILE_PATH,
     INVALID_TYPE_FOR_ACTIVITY,
     INSUFFICIENT_PERMISSIONS,
+    SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE,
     UNKNOWN,
 };
 
 enum class Activity {
     GENERATE,
     ADD,
+    REMOVE,
 };
 
 enum class Type {
