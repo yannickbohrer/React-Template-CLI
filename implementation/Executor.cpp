@@ -143,6 +143,7 @@ void CLI::Executor::Generate() {
 }
 
 void CLI::Executor::GenerateComponent() {
+    // TODO: css flag
     bool css = false;
     GenerateRequiredDirectories();
     std::filesystem::create_directory(m_Path + "tests/");
