@@ -13,7 +13,23 @@ make
 sudo make install
 ```
 
-### Commands
+### Syntax 
+`react-cli [activity] [type] [path] [--flags]`
+
+##### Activities:
+- generate
+- add
+- remove
+- list
+
+##### Types:
+- component
+- template
+
+##### Flags:
+- --css
+
+##### Compatible Types:
 - `react-cli generate component path/to/MyComponent`
 - `react-cli add template path/to/MyExistingFile`
 - `react-cli remove template MyTemplate`
