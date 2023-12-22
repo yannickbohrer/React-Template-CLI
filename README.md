@@ -16,26 +16,13 @@ sudo make install
 ### Syntax 
 `react-cli [activity] [type] [path] [--flags]`
 
-##### Activities:
-- generate
-- add
-- remove
-- list
-
-##### Types:
-- component
-- template
-
-##### Flags:
-- --css
-
-##### Compatible Types:
-- `react-cli generate component path/to/MyComponent`
+### available commands
+- `react-cli generate component path/to/MyComponent [--css]`
 - `react-cli add template path/to/MyExistingFile`
 - `react-cli remove template MyTemplate`
 - `react-cli list template`
 
-note: removing or creating template files requires superuser permissions due to the modification of the installation directory
+note: removing or creating template files requires superuser priviliges due to modification of the installation directory
 
 ### Custom template directory:
 ```bash
