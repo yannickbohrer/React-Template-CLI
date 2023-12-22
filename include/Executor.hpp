@@ -4,6 +4,7 @@
 #include <string>
 #include <tuple>
 #include <variant>
+#include <vector>
 #include "CLI.hpp"
 
 class CLI::Executor {
@@ -45,6 +46,7 @@ private:
     std::variant<std::monostate, CLI::Type> m_Type;
     std::string m_Path;
     std::string m_Name;
+    std::vector<std::string> m_Flags;
 };
 
 #endif

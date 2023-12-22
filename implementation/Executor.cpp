@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -24,6 +25,16 @@ void CLI::Executor::Run(const int argc, const char* argv[]) {
     cli.MatchType(std::string(argv[2]));
     if (argc > 3)
         cli.m_Path = argv[3];
+    if (argc > 4) {
+        int it = 4;
+        while (it < argc) {
+            std::string flag = std::string(argv[it]);
+            if (!flag.starts_with(CLI::Config::flagPrefix))
+                CLI::ErrorHandler error(CLI::Error::INVALID_FLAG_SYNTAX);
+            cli.m_Flags.emplace_back(flag.substr(2, flag.length() - 2));
+            it++;
+        }
+    }
     cli.Execute();
 }
 
@@ -91,8 +102,6 @@ void CLI::Executor::Execute() {
             Remove();
             break;
         case CLI::Activity::LIST:
-            if (geteuid() != 0)
-                CLI::ErrorHandler error(CLI::Error::INSUFFICIENT_PERMISSIONS);
             List();
             break;
         default:
@@ -143,29 +152,38 @@ void CLI::Executor::Generate() {
 }
 
 void CLI::Executor::GenerateComponent() {
-    // TODO: css flag
     bool css = false;
+    for (const std::string& flag : m_Flags) {
+        if (flag == CLI::Tokens::css)
+            css = true;
+    }
+    const std::string& fileName = ExtractComponentName();
     GenerateRequiredDirectories();
     std::filesystem::create_directory(m_Path + "tests/");
 
     std::fstream componentFile(m_Path + m_Name + ".jsx", std::ios::out);
     std::fstream componentTestFile(m_Path + "tests/" + m_Name + ".test.js", std::ios::out);
 
-    std::fstream componentTemplate;
-    componentTemplate.open(CLI::Config::assetsDir + "component-js.txt", std::ios::in);
+    std::fstream componentTemplate(CLI::Config::assetsDir + "component-js.txt", std::ios::in);
 
-    std::fstream componentTestTemplate;
-    componentTestTemplate.open(CLI::Config::assetsDir + "component-test-js.txt", std::ios::in);
-
+    std::fstream componentTestTemplate(CLI::Config::assetsDir + "component-test-js.txt",
+                                       std::ios::in);
+    
+    std::cout << "task: generating " << fileName << ".jsx           | ";
     ApplyTemplate(componentTemplate, componentFile);
+    std::cout << "DONE\n";
+    std::cout << "task: generating tests/" << fileName << ".test.js | ";
     ApplyTemplate(componentTestTemplate, componentTestFile);
+    std::cout << "DONE\n";
 
     if (css) {
         std::fstream componentStylesFile(m_Path + m_Name + ".css", std::ios::out);
         std::fstream componentStylesTemplate;
         componentStylesTemplate.open(CLI::Config::assetsDir + "component-styles-css.txt",
                                      std::ios::in);
+        std::cout << "task: generating " << fileName << ".css           | ";
         ApplyTemplate(componentStylesTemplate, componentStylesFile);
+        std::cout << "DONE\n";
     }
 }
 

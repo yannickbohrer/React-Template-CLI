@@ -40,12 +40,16 @@ CLI::ErrorHandler::ErrorHandler(CLI::Error err) {
             std::cerr << "Custom templated directory is empty\n"
                 << "Use 'react-cli generate template path/to/MyExistingFile' to generate custom templates\n";
             break;
+        case CLI::Error::INVALID_FLAG_SYNTAX:
+            std::cerr << "Invalid flag Syntax. Every flag has to begin with '--'\n";
+            syntaxErr = true;
+            break;
         case CLI::Error::UNKNOWN:
         default:
             std::cerr << "An unknown error has occured\n";
     }
     if (syntaxErr)
-        std::cout << "required format: react-cli [activity] [type] [name]\n";
+        std::cout << "required format: react-cli [activity] [type] [name] [--flag]\n";
 
     exit(EXIT_FAILURE);
 }

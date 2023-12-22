@@ -19,7 +19,7 @@ sudo make install
 - `react-cli remove template MyTemplate`
 - `react-cli list template`
 
-note: template related calls require superuser permissions since they modify the installation directory
+note: removing or creating template files requires superuser permissions due to the modification of the installation directory
 
 ### Custom template directory:
 ```bash

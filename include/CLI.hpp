@@ -15,11 +15,15 @@ inline const std::string list = "list";
 // Types
 inline const std::string component = "component";
 inline const std::string fileTemplate = "template";
+
+// flags
+inline const std::string css = "css";
 }  // namespace Tokens
 
 namespace Config {
 inline const std::string assetsDir = "/usr/local/share/react-cli/assets/templates/";
 inline const std::string customAssetsDir = "/usr/local/share/react-cli/assets/templates/custom/";
+inline const std::string flagPrefix = "--";
 }  // namespace Config
 
 enum class Error {
@@ -31,6 +35,7 @@ enum class Error {
     INSUFFICIENT_PERMISSIONS,
     SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE,
     NO_CUSTOM_TEMPLATES_FOUND,
+    INVALID_FLAG_SYNTAX,
     UNKNOWN,
 };
 
