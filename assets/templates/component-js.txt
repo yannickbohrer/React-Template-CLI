@@ -1,9 +1,9 @@
-export function %() {
+export function %TEMPLATE_PLACEHOLDER%() {
     return (
         <>
-            <h1>% Works</h1>
+            <h1>%TEMPLATE_PLACEHOLDER% Works</h1>
         </>
     )
 }
 
-export default %
+export default %TEMPLATE_PLACEHOLDER%

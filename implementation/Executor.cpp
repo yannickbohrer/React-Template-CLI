@@ -112,13 +112,10 @@ void CLI::Executor::Execute() {
 void CLI::Executor::ApplyTemplate(std::fstream& from, std::fstream& to) const {
     std::string line;
     while (std::getline(from, line)) {
-        for (const char c : line) {
-            if (c == '%')
-                to << m_Name;
-            else
-                to << c;
-        }
-        to << '\n';
+        const std::size_t pos = line.find(CLI::Config::templatePlaceholder);
+        if (pos != std::string::npos)
+            line.replace(pos, CLI::Config::templatePlaceholder.length(), m_Name);
+        to << line << '\n';
     }
     from.close();
     to.close();
@@ -130,7 +127,7 @@ void CLI::Executor::GenerateTemplate(std::fstream& from, std::fstream& to) const
     while (std::getline(from, line)) {
         const std::size_t pos = line.find(componentName);
         if (pos != std::string::npos)
-            line.replace(pos, componentName.length(), "%");
+            line.replace(pos, componentName.length(), CLI::Config::templatePlaceholder);
         to << line << '\n';
     }
     from.close();
@@ -153,26 +150,44 @@ void CLI::Executor::Generate() {
 
 void CLI::Executor::GenerateComponent() {
     bool css = false;
+    std::string customTemplate;
     for (const std::string& flag : m_Flags) {
         if (flag == CLI::Tokens::css)
             css = true;
+        else if (flag.starts_with(CLI::Tokens::fileTemplate))
+            customTemplate = flag.substr(flag.find_first_of('=') + 1,
+                                         flag.length() - CLI::Tokens::fileTemplate.length() - 1);
     }
-    const std::string& fileName = ExtractComponentName();
+    
+    std::string requestedTemplate;
+    std::string componentSuffix = ".jsx";
+    if (!customTemplate.empty()) {
+        customTemplate = IsCustomTemplate(customTemplate);
+        if (customTemplate.empty())
+            CLI::ErrorHandler error(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
+        requestedTemplate = CLI::Config::customAssetsDir + customTemplate;
+        componentSuffix = customTemplate.substr(customTemplate.find_last_of('.'));
+    }
+
     GenerateRequiredDirectories();
     std::filesystem::create_directory(m_Path + "tests/");
-
-    std::fstream componentFile(m_Path + m_Name + ".jsx", std::ios::out);
+    
+    std::fstream componentFile(m_Path + m_Name + componentSuffix,std::ios::out);
     std::fstream componentTestFile(m_Path + "tests/" + m_Name + ".test.js", std::ios::out);
 
-    std::fstream componentTemplate(CLI::Config::assetsDir + "component-js.txt", std::ios::in);
+    std::fstream componentTemplate;
+    if (customTemplate.empty())
+        componentTemplate.open(CLI::Config::assetsDir + "component-js.txt", std::ios::in);
+    else
+        componentTemplate.open(requestedTemplate, std::ios::in);
 
     std::fstream componentTestTemplate(CLI::Config::assetsDir + "component-test-js.txt",
                                        std::ios::in);
-    
-    std::cout << "task: generating " << fileName << ".jsx           | ";
+
+    std::cout << "task: generating " << m_Name << ".jsx           | ";
     ApplyTemplate(componentTemplate, componentFile);
     std::cout << "DONE\n";
-    std::cout << "task: generating tests/" << fileName << ".test.js | ";
+    std::cout << "task: generating tests/" << m_Name << ".test.js | ";
     ApplyTemplate(componentTestTemplate, componentTestFile);
     std::cout << "DONE\n";
 
@@ -181,7 +196,7 @@ void CLI::Executor::GenerateComponent() {
         std::fstream componentStylesTemplate;
         componentStylesTemplate.open(CLI::Config::assetsDir + "component-styles-css.txt",
                                      std::ios::in);
-        std::cout << "task: generating " << fileName << ".css           | ";
+        std::cout << "task: generating " << m_Name << ".css           | ";
         ApplyTemplate(componentStylesTemplate, componentStylesFile);
         std::cout << "DONE\n";
     }
@@ -234,7 +249,7 @@ std::string CLI::Executor::ExtractComponentName() const {
 void CLI::Executor::Remove() {
     if (m_Path != "" && m_Path != CLI::Config::customAssetsDir)
         CLI::ErrorHandler error(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
-    if (!IsCustomTemplate())
+    if (IsCustomTemplate(CLI::Executor::Get().m_Name).empty())
         CLI::ErrorHandler error(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
 
     const auto* type = std::get_if<CLI::Type>(&m_Type);
@@ -250,15 +265,14 @@ void CLI::Executor::Remove() {
     }
 }
 
-bool CLI::Executor::IsCustomTemplate() const {
-    bool result = false;
+std::string CLI::Executor::IsCustomTemplate(std::string& templateName) const {
     for (const auto& file : std::filesystem::directory_iterator(CLI::Config::customAssetsDir)) {
         std::string path = std::string(file.path());
         std::string name = path.substr(path.find_last_of("/") + 1);
-        if (name == m_Name)
-            result = true;
+        if (name.starts_with(templateName))
+            return name;
     }
-    return result;
+    return "";
 }
 
 void CLI::Executor::RemoveTemplateFile() {

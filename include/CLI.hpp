@@ -23,6 +23,7 @@ inline const std::string css = "css";
 namespace Config {
 inline const std::string assetsDir = "/usr/local/share/react-cli/assets/templates/";
 inline const std::string customAssetsDir = "/usr/local/share/react-cli/assets/templates/custom/";
+inline const std::string templatePlaceholder = "%TEMPLATE_PLACEHOLDER%";
 inline const std::string flagPrefix = "--";
 }  // namespace Config
 
