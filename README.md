@@ -17,7 +17,7 @@ sudo make install
 `react-cli [activity] [type] [path] [--flags]`
 
 ### available commands
-[] indicate optional parameter
+`[] indicate optional parameter`
 - `react-cli generate component path/to/MyComponent [--css] [--template=CustomTemplate]`
 - `react-cli add template path/to/MyExistingFile`
 - `react-cli remove template MyTemplate`
