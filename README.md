@@ -5,7 +5,7 @@
 
 ### Install
 ```bash
-clone repo
+git clone git@github.com:yannickbohrer/react-cli.git
 cd react-cli
 cmake -S ./ -B build/
 cd build
