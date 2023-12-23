@@ -25,8 +25,7 @@ sudo make install
 
 Flags:
 - `--css`: Dedicated css file for component will be generated
-- `--template=CustomTemplate`: Use custom template for component generation
-  => if not set, standard component template will be generated
+- `--template=CustomTemplate`: Use custom template for component generation. Not set: Standard template will be used
 
 ### Important:
 - removing or creating template files requires superuser priviliges due to modification of the installation directory
