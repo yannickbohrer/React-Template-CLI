@@ -1,10 +1,9 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "../include/ErrorHandler.hpp"
 #include "../include/Executor.hpp"
 
-CLI::ErrorHandler::ErrorHandler(CLI::Error err) {
+void CLI::ErrorHandler(CLI::Error err) {
     const auto& exec = CLI::Executor::Get();
     std::cerr << "--------------- Error ---------------\nMessage: ";
     bool syntaxErr = false;
@@ -31,6 +30,10 @@ CLI::ErrorHandler::ErrorHandler(CLI::Error err) {
         case CLI::Error::INSUFFICIENT_PERMISSIONS:
             std::cerr << "Insufficient Permissions!\n"
                 << "Fix available: Execute react-cli with superuser privileges\n";
+            break;
+        case CLI::Error::SELECTED_FILE_IS_NOT_REACT_COMPONENT:
+            std::cerr << exec.FilePath() << exec.FileName() <<" is not a React component\n"
+                << "Fix suggestion: check file extension\n";
             break;
         case CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE:
             std::cerr << "Requested file is not a custom template\n"

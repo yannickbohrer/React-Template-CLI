@@ -1,5 +1,4 @@
 #include <unistd.h>
-#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -30,7 +29,7 @@ void CLI::Executor::Run(const int argc, const char* argv[]) {
         while (it < argc) {
             std::string flag = std::string(argv[it]);
             if (!flag.starts_with(CLI::Config::flagPrefix))
-                CLI::ErrorHandler error(CLI::Error::INVALID_FLAG_SYNTAX);
+                CLI::ErrorHandler(CLI::Error::INVALID_FLAG_SYNTAX);
             cli.m_Flags.emplace_back(flag.substr(2, flag.length() - 2));
             it++;
         }
@@ -57,7 +56,7 @@ void CLI::Executor::MatchActivity(const std::string& arg) {
         m_Activity = CLI::Activity::LIST;
 
     if (std::holds_alternative<std::monostate>(m_Activity))
-        CLI::ErrorHandler error(CLI::Error::INVALID_ACTIVITY);
+        CLI::ErrorHandler(CLI::Error::INVALID_ACTIVITY);
 }
 
 void CLI::Executor::MatchType(const std::string& arg) {
@@ -67,7 +66,7 @@ void CLI::Executor::MatchType(const std::string& arg) {
         m_Type = CLI::Type::TEMPLATE;
 
     if (std::holds_alternative<std::monostate>(m_Type))
-        CLI::ErrorHandler error(CLI::Error::INVALID_TYPE);
+        CLI::ErrorHandler(CLI::Error::INVALID_TYPE);
 }
 
 std::tuple<std::string, std::string> CLI::Executor::SplitPathAndName() const {
@@ -85,7 +84,7 @@ void CLI::Executor::Execute() {
     const auto* activity = std::get_if<CLI::Activity>(&m_Activity);
 
     if (!activity)
-        CLI::ErrorHandler error(CLI::Error::UNKNOWN);
+        CLI::ErrorHandler(CLI::Error::UNKNOWN);
 
     switch (*activity) {
         case CLI::Activity::GENERATE:
@@ -93,19 +92,19 @@ void CLI::Executor::Execute() {
             break;
         case CLI::Activity::ADD:
             if (geteuid() != 0)
-                CLI::ErrorHandler error(CLI::Error::INSUFFICIENT_PERMISSIONS);
+                CLI::ErrorHandler(CLI::Error::INSUFFICIENT_PERMISSIONS);
             Add();
             break;
         case CLI::Activity::REMOVE:
             if (geteuid() != 0)
-                CLI::ErrorHandler error(CLI::Error::INSUFFICIENT_PERMISSIONS);
+                CLI::ErrorHandler(CLI::Error::INSUFFICIENT_PERMISSIONS);
             Remove();
             break;
         case CLI::Activity::LIST:
             List();
             break;
         default:
-            CLI::ErrorHandler error(CLI::Error::UNKNOWN);
+            CLI::ErrorHandler(CLI::Error::UNKNOWN);
     }
 }
 
@@ -137,14 +136,14 @@ void CLI::Executor::GenerateTemplate(std::fstream& from, std::fstream& to) const
 void CLI::Executor::Generate() {
     const auto* type = std::get_if<CLI::Type>(&m_Type);
     if (!type)
-        CLI::ErrorHandler error(CLI::Error::UNKNOWN);
+        CLI::ErrorHandler(CLI::Error::UNKNOWN);
 
     switch (*type) {
         case CLI::Type::COMPONENT:
             GenerateComponent();
             break;
         default:
-            CLI::ErrorHandler error(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
+            CLI::ErrorHandler(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
     }
 }
 
@@ -158,21 +157,21 @@ void CLI::Executor::GenerateComponent() {
             customTemplate = flag.substr(flag.find_first_of('=') + 1,
                                          flag.length() - CLI::Tokens::fileTemplate.length() - 1);
     }
-    
+
     std::string requestedTemplate;
-    std::string componentSuffix = ".jsx";
+    std::string componentFileExtension = ".jsx";
     if (!customTemplate.empty()) {
         customTemplate = IsCustomTemplate(customTemplate);
         if (customTemplate.empty())
-            CLI::ErrorHandler error(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
+            CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
         requestedTemplate = CLI::Config::customAssetsDir + customTemplate;
-        componentSuffix = customTemplate.substr(customTemplate.find_last_of('.'));
+        componentFileExtension = customTemplate.substr(customTemplate.find_last_of('.'));
     }
 
     GenerateRequiredDirectories();
     std::filesystem::create_directory(m_Path + "tests/");
-    
-    std::fstream componentFile(m_Path + m_Name + componentSuffix,std::ios::out);
+
+    std::fstream componentFile(m_Path + m_Name + componentFileExtension, std::ios::out);
     std::fstream componentTestFile(m_Path + "tests/" + m_Name + ".test.js", std::ios::out);
 
     std::fstream componentTemplate;
@@ -219,24 +218,26 @@ void CLI::Executor::GenerateRequiredDirectories() const {
 }
 
 void CLI::Executor::Add() {
+    if (!m_Name.ends_with(".jsx") && !m_Name.ends_with(".tsx") && !m_Name.ends_with(".js") &&
+        !m_Name.ends_with(".ts"))
+        CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_REACT_COMPONENT);
     const auto* type = std::get_if<CLI::Type>(&m_Type);
     if (!type)
-        CLI::ErrorHandler error(CLI::Error::UNKNOWN);
+        CLI::ErrorHandler(CLI::Error::UNKNOWN);
 
     switch (*type) {
         case CLI::Type::TEMPLATE:
             AddTemplateFile();
             break;
         default:
-            CLI::ErrorHandler error(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
+            CLI::ErrorHandler(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
     }
 }
 
 void CLI::Executor::AddTemplateFile() {
     std::fstream file(m_Path + m_Name);
-
     if (!file.is_open())
-        CLI::ErrorHandler error(CLI::Error::INVALID_FILE_PATH);
+        CLI::ErrorHandler(CLI::Error::INVALID_FILE_PATH);
 
     std::fstream templateFile(CLI::Config::customAssetsDir + m_Name, std::ios::out);
     GenerateTemplate(file, templateFile);
@@ -248,20 +249,20 @@ std::string CLI::Executor::ExtractComponentName() const {
 
 void CLI::Executor::Remove() {
     if (m_Path != "" && m_Path != CLI::Config::customAssetsDir)
-        CLI::ErrorHandler error(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
+        CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
     if (IsCustomTemplate(CLI::Executor::Get().m_Name).empty())
-        CLI::ErrorHandler error(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
+        CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
 
     const auto* type = std::get_if<CLI::Type>(&m_Type);
     if (!type)
-        CLI::ErrorHandler error(CLI::Error::UNKNOWN);
+        CLI::ErrorHandler(CLI::Error::UNKNOWN);
 
     switch (*type) {
         case CLI::Type::TEMPLATE:
             RemoveTemplateFile();
             break;
         default:
-            CLI::ErrorHandler error(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
+            CLI::ErrorHandler(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
     }
 }
 
@@ -277,20 +278,20 @@ std::string CLI::Executor::IsCustomTemplate(std::string& templateName) const {
 
 void CLI::Executor::RemoveTemplateFile() {
     if (std::remove((CLI::Config::customAssetsDir + m_Name).c_str()) != 0)
-        CLI::ErrorHandler error(CLI::Error::UNKNOWN);
+        CLI::ErrorHandler(CLI::Error::UNKNOWN);
 }
 
 void CLI::Executor::List() const {
     const auto* type = std::get_if<CLI::Type>(&m_Type);
     if (!type)
-        CLI::ErrorHandler error(CLI::Error::UNKNOWN);
+        CLI::ErrorHandler(CLI::Error::UNKNOWN);
 
     switch (*type) {
         case CLI::Type::TEMPLATE:
             ListCustomTemplateFiles();
             break;
         default:
-            CLI::ErrorHandler error(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
+            CLI::ErrorHandler(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
     }
 }
 
@@ -305,7 +306,7 @@ void CLI::Executor::ListCustomTemplateFiles() const {
     }
     std::cout << std::endl;
     if (std::filesystem::is_empty(CLI::Config::customAssetsDir))
-        CLI::ErrorHandler error(CLI::Error::NO_CUSTOM_TEMPLATES_FOUND);
+        CLI::ErrorHandler(CLI::Error::NO_CUSTOM_TEMPLATES_FOUND);
     std::cout << "Custom file templates:\n";
     for (const auto& file : std::filesystem::directory_iterator(CLI::Config::customAssetsDir)) {
         std::string path = std::string(file.path());

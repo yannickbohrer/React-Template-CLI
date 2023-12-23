@@ -34,6 +34,7 @@ enum class Error {
     INVALID_FILE_PATH,
     INVALID_TYPE_FOR_ACTIVITY,
     INSUFFICIENT_PERMISSIONS,
+    SELECTED_FILE_IS_NOT_REACT_COMPONENT,
     SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE,
     NO_CUSTOM_TEMPLATES_FOUND,
     INVALID_FLAG_SYNTAX,
@@ -53,7 +54,7 @@ enum class Type {
 };
 
 class Executor;
-class ErrorHandler;
+void ErrorHandler(CLI::Error);
 
 }  // namespace CLI
 
