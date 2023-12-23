@@ -14,7 +14,6 @@ target_compile_features(react-cli PRIVATE cxx_range_for)
 
 install(TARGETS react-cli DESTINATION bin) 
 
-#[[ set(ASSETS_DIRECTORY "${CMAKE_INSTALL_PREFIX}/share/react-cli/assets")
 set(CUSTOM_DIRECTORY "${ASSETS_DIRECTORY}/custom")
 file(MAKE_DIRECTORY ${CUSTOM_DIRECTORY})
 install(DIRECTORY assets/ DESTINATION share/react-cli/assets) ]]
