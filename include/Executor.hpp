@@ -33,7 +33,7 @@ private:
 
     void Remove();
     void RemoveTemplateFile();
-    std::string IsCustomTemplate(std::string&) const;
+    std::string IsCustomTemplate(const std::string&) const;
 
     void List() const;
     void ListCustomTemplateFiles() const;

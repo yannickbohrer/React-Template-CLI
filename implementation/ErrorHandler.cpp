@@ -5,7 +5,7 @@
 
 void CLI::ErrorHandler(CLI::Error err) {
     const auto& exec = CLI::Executor::Get();
-    std::cerr << "--------------- Error ---------------\nMessage: ";
+    std::cerr << "\n--------------- Error ---------------\nMessage: ";
     bool syntaxErr = false;
     switch (err) {
         case CLI::Error::NOT_ENOUGH_ARGUMENTS:
