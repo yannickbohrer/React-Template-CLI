@@ -3,7 +3,7 @@
 ### Requirements
 - cmake standard >= 3.25
 
-### Install
+### Installation
 ```bash
 git clone git@github.com:yannickbohrer/react-cli.git
 cd react-cli
@@ -16,7 +16,7 @@ sudo make install
 ### Syntax 
 `react-cli [activity] [type] [path] [--flags]`
 
-### Functionalities
+### Usage
 `[]` indicate optional parameter
 - `react-cli generate component path/to/MyComponent [--css] [--template=CustomTemplate]`
 - `react-cli add template path/to/MyExistingFile`
