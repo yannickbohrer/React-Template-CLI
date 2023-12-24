@@ -16,7 +16,7 @@ install(TARGETS react-cli DESTINATION bin)
 
 set(CUSTOM_DIRECTORY "${ASSETS_DIRECTORY}/custom")
 file(MAKE_DIRECTORY ${CUSTOM_DIRECTORY})
-install(DIRECTORY assets/ DESTINATION share/react-cli/assets) ]]
+install(DIRECTORY assets/ DESTINATION share/react-cli/assets)
 
 install(CODE "file(MAKE_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/share/react-cli/assets/templates/custom\")")
 install(DIRECTORY assets/ DESTINATION share/react-cli/assets)
