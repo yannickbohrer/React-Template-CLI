@@ -111,6 +111,7 @@ void CLI::Executor::Execute() {
 void CLI::Executor::ApplyTemplate(std::fstream& from, std::fstream& to) const {
     std::string line;
     while (std::getline(from, line)) {
+        // TODO: Multiple occurences of placeholder on the same line
         const std::size_t pos = line.find(CLI::Config::templatePlaceholder);
         if (pos != std::string::npos)
             line.replace(pos, CLI::Config::templatePlaceholder.length(), m_Name);
@@ -124,6 +125,7 @@ void CLI::Executor::GenerateTemplate(std::fstream& from, std::fstream& to) const
     const std::string componentName = ExtractComponentName();
     std::string line;
     while (std::getline(from, line)) {
+        // TODO: Multiple occurences of component name on the same line
         const std::size_t pos = line.find(componentName);
         if (pos != std::string::npos)
             line.replace(pos, componentName.length(), CLI::Config::templatePlaceholder);

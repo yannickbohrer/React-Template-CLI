@@ -7,9 +7,9 @@
 ```bash
 git clone git@github.com:yannickbohrer/react-cli.git
 cd react-cli
-cmake -S ./ -B build/
+sudo cmake -S ./ -B build/
 cd build
-make
+sudo make
 sudo make install
 ```
 
