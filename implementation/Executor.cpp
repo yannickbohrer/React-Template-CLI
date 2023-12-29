@@ -111,10 +111,11 @@ void CLI::Executor::Execute() {
 void CLI::Executor::ApplyTemplate(std::fstream& from, std::fstream& to) const {
     std::string line;
     while (std::getline(from, line)) {
-        // TODO: Multiple occurences of placeholder on the same line
-        const std::size_t pos = line.find(CLI::Config::templatePlaceholder);
-        if (pos != std::string::npos)
+        std::size_t pos = line.find(CLI::Config::templatePlaceholder);
+        while (pos != std::string::npos) {
             line.replace(pos, CLI::Config::templatePlaceholder.length(), m_Name);
+            pos = line.find(CLI::Config::templatePlaceholder);
+        }
         to << line << '\n';
     }
     from.close();
@@ -125,10 +126,11 @@ void CLI::Executor::GenerateTemplate(std::fstream& from, std::fstream& to) const
     const std::string componentName = ExtractComponentName();
     std::string line;
     while (std::getline(from, line)) {
-        // TODO: Multiple occurences of component name on the same line
-        const std::size_t pos = line.find(componentName);
-        if (pos != std::string::npos)
+        std::size_t pos = line.find(componentName);
+        while (pos != std::string::npos) {
             line.replace(pos, componentName.length(), CLI::Config::templatePlaceholder);
+            pos = line.find(componentName);
+        }
         to << line << '\n';
     }
     from.close();
@@ -246,7 +248,7 @@ void CLI::Executor::AddTemplateFile() {
         CLI::ErrorHandler(CLI::Error::INVALID_FILE_PATH);
 
     std::fstream templateFile(CLI::Config::customAssetsDir + m_Name, std::ios::out);
-    
+
     std::cout << "task: add template " << m_Name << "           | ";
     GenerateTemplate(file, templateFile);
     std::cout << "DONE\n";
