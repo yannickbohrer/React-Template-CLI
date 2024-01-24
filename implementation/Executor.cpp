@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <array>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -18,22 +19,31 @@ CLI::Executor& CLI::Executor::Get() {
     return m_Instance;
 }
 
-void CLI::Executor::Run(const int argc, const char* argv[]) {
+std::array<std::string, 2> CLI::Executor::ExtractArgs(const int argc, const char* argv[]) {
     auto& cli = CLI::Executor::Get();
-    cli.MatchActivity(std::string(argv[1]));
-    cli.MatchType(std::string(argv[2]));
-    if (argc > 3)
-        cli.m_Path = argv[3];
-    if (argc > 4) {
-        int it = 4;
-        while (it < argc) {
-            const std::string flag = std::string(argv[it]);
-            if (!flag.starts_with(CLI::Config::flagPrefix))
-                CLI::ErrorHandler(CLI::Error::INVALID_FLAG_SYNTAX);
-            cli.m_Flags.emplace_back(flag.substr(2, flag.length() - 2));
-            it++;
+    std::array<std::string, 2> res;
+    int it = 1, arrIdx = 0;
+    while (it < argc) {
+        const std::string arg = std::string(argv[it]);
+        it++;
+        if (arg.starts_with(CLI::Config::flagPrefix)) {
+            cli.m_Flags.emplace_back(arg.substr(2, arg.length() - 2));
+        } else if (arrIdx < 2) {
+            res.at(arrIdx) = arg;
+            arrIdx++;
+        } else if (arrIdx == 2) {
+            cli.m_Path = arg;
+            arrIdx++;
         }
     }
+    return res;
+}
+
+void CLI::Executor::Run(const int argc, const char* argv[]) {
+    auto& cli = CLI::Executor::Get();
+    auto args = cli.ExtractArgs(argc, argv);
+    cli.MatchActivity(std::string(std::get<0>(args)));
+    cli.MatchType(std::string(std::get<1>(args)));
     cli.Execute();
 }
 

@@ -16,6 +16,7 @@ public:
     std::string FileName() const;
 
 private:
+    std::array<std::string, 2> ExtractArgs(const int,const char* []);
     void MatchActivity(const std::string&);
     void MatchType(const std::string&);
     std::tuple<std::string, std::string> SplitPathAndName() const;

@@ -6,6 +6,7 @@
 namespace CLI {
 
 namespace Tokens {
+
 // Activities
 inline const std::string generate = "generate";
 inline const std::string add = "add";
