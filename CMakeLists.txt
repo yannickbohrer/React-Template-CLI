@@ -14,9 +14,11 @@ target_compile_features(rtc PRIVATE cxx_range_for)
 
 install(TARGETS rtc DESTINATION bin) 
 
-set(CUSTOM_DIRECTORY "${ASSETS_DIRECTORY}/custom")
-file(MAKE_DIRECTORY ${CUSTOM_DIRECTORY})
-install(DIRECTORY assets/ DESTINATION share/rtc/assets)
+# create templates dir and clone assets/templates into it
+install(CODE "file(MAKE_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/share/rtc/templates\")")
+install(CODE "file(MAKE_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/share/rtc/templates/custom\")")
+install(DIRECTORY assets/templates/ DESTINATION share/rtc/templates)
 
-install(CODE "file(MAKE_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/share/rtc/assets/templates/custom\")")
-install(DIRECTORY assets/ DESTINATION share/rtc/assets)
+# create history dir and create history file
+install(CODE "file(MAKE_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/share/rtc/history\")")
+install(CODE "file(WRITE \"\${CMAKE_INSTALL_PREFIX}/share/rtc/history/history.txt\")")

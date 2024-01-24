@@ -23,8 +23,8 @@ inline const std::string css = "css";
 }  // namespace Tokens
 
 namespace Config {
-inline const std::string assetsDir = "/usr/local/share/rtc/assets/templates/";
-inline const std::string customAssetsDir = "/usr/local/share/rtc/assets/templates/custom/";
+inline const std::string assetsDir = "/usr/local/share/rtc/templates/";
+inline const std::string customAssetsDir = "/usr/local/share/rtc/templates/custom/";
 inline const std::string templatePlaceholder = "%TEMPLATE_PLACEHOLDER%";
 inline const std::string flagPrefix = "--";
 }  // namespace Config

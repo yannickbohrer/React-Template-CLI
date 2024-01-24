@@ -1,4 +1,4 @@
-# rtc
+# react-template-cli (rtc) 
 
 ### Requirements
 - cmake standard >= 3.25
@@ -22,6 +22,7 @@ sudo make install
 - `rtc add template path/to/MyExistingFile`
 - `rtc remove template MyTemplate`
 - `rtc list template`
+- `rtc history`
 
 Flags:
 - `--css`: Dedicated css file for component will be generated
@@ -33,5 +34,5 @@ Flags:
 
 ### Custom template directory:
 ```bash
-/usr/local/share/rtc/assets/templates/custom/
+/usr/local/share/rtc/templates/custom/
 ```
