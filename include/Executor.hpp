@@ -39,6 +39,8 @@ private:
     void List() const;
     void ListCustomTemplateFiles() const;
 
+    void History() const;
+
     Executor();
     Executor(const Executor&) = delete;
     static Executor m_Instance;

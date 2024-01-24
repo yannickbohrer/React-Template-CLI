@@ -43,7 +43,8 @@ void CLI::Executor::Run(const int argc, const char* argv[]) {
     auto& cli = CLI::Executor::Get();
     auto args = cli.ExtractArgs(argc, argv);
     cli.MatchActivity(std::string(std::get<0>(args)));
-    cli.MatchType(std::string(std::get<1>(args)));
+    if (*std::get_if<CLI::Activity>(&cli.m_Activity) != CLI::Activity::HISTORY)
+        cli.MatchType(std::string(std::get<1>(args)));
     cli.Execute();
 }
 
@@ -64,6 +65,8 @@ void CLI::Executor::MatchActivity(const std::string& arg) {
         m_Activity = CLI::Activity::REMOVE;
     else if (arg == CLI::Tokens::list)
         m_Activity = CLI::Activity::LIST;
+    else if (arg == CLI::Tokens::history)
+        m_Activity = CLI::Activity::HISTORY;
 
     if (std::holds_alternative<std::monostate>(m_Activity))
         CLI::ErrorHandler(CLI::Error::INVALID_ACTIVITY);
@@ -112,6 +115,9 @@ void CLI::Executor::Execute() {
             break;
         case CLI::Activity::LIST:
             List();
+            break;
+        case CLI::Activity::HISTORY:
+            History();
             break;
         default:
             CLI::ErrorHandler(CLI::Error::UNKNOWN);
@@ -336,4 +342,8 @@ void CLI::Executor::ListCustomTemplateFiles() const {
         const std::string name = path.substr(path.find_last_of("/") + 1);
         std::cout << "\t- " << name << "\n";
     }
+}
+
+void CLI::Executor::History() const {
+    std::cout << "Your History\n\n";
 }

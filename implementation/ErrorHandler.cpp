@@ -9,7 +9,7 @@ void CLI::ErrorHandler(CLI::Error err) {
     bool syntaxErr = false;
     switch (err) {
         case CLI::Error::NOT_ENOUGH_ARGUMENTS:
-            std::cerr << "Not enough arguments! Minimum: 2 args required\n";
+            std::cerr << "Not enough arguments! Minimum: 1 args required\n";
             syntaxErr = true;
             break;
         case CLI::Error::INVALID_ACTIVITY:

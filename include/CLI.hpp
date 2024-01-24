@@ -12,6 +12,7 @@ inline const std::string generate = "generate";
 inline const std::string add = "add";
 inline const std::string remove = "remove";
 inline const std::string list = "list";
+inline const std::string history = "history";
 
 // Types
 inline const std::string component = "component";
@@ -22,8 +23,8 @@ inline const std::string css = "css";
 }  // namespace Tokens
 
 namespace Config {
-inline const std::string assetsDir = "/usr/local/share/react-cli/assets/templates/";
-inline const std::string customAssetsDir = "/usr/local/share/react-cli/assets/templates/custom/";
+inline const std::string assetsDir = "/usr/local/share/rtc/assets/templates/";
+inline const std::string customAssetsDir = "/usr/local/share/rtc/assets/templates/custom/";
 inline const std::string templatePlaceholder = "%TEMPLATE_PLACEHOLDER%";
 inline const std::string flagPrefix = "--";
 }  // namespace Config
@@ -47,6 +48,7 @@ enum class Activity {
     ADD,
     REMOVE,
     LIST,
+    HISTORY,
 };
 
 enum class Type {

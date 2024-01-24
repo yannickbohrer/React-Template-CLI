@@ -5,7 +5,7 @@
 #include "include/Executor.hpp"
 
 int main(const int argc, const char* argv[]) {
-    if (argc < 3) {
+    if (argc < 2) {
         CLI::ErrorHandler(CLI::Error::NOT_ENOUGH_ARGUMENTS);
     }
 
