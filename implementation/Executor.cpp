@@ -46,6 +46,19 @@ void CLI::Executor::Run(const int argc, const char* argv[]) {
     if (*std::get_if<CLI::Activity>(&cli.m_Activity) != CLI::Activity::HISTORY)
         cli.MatchType(std::string(std::get<1>(args)));
     cli.Execute();
+    cli.AddToHistory(argc, argv);
+}
+
+void CLI::Executor::AddToHistory(int argc, const char* argv[]) const {
+    std::fstream history(CLI::Config::assetsDir + "history/history.txt", std::ios::out);
+    std::string cmd;
+    int it = 0;
+    while (it < argc) {
+        cmd += std::string(argv[it]);
+        it++;
+    }
+    history << cmd << "\n";
+    history.close();
 }
 
 std::string CLI::Executor::FilePath() const {
@@ -104,13 +117,9 @@ void CLI::Executor::Execute() {
             Generate();
             break;
         case CLI::Activity::ADD:
-            if (geteuid() != 0)
-                CLI::ErrorHandler(CLI::Error::INSUFFICIENT_PERMISSIONS);
             Add();
             break;
         case CLI::Activity::REMOVE:
-            if (geteuid() != 0)
-                CLI::ErrorHandler(CLI::Error::INSUFFICIENT_PERMISSIONS);
             Remove();
             break;
         case CLI::Activity::LIST:
@@ -262,7 +271,7 @@ void CLI::Executor::AddTemplateFile() {
     std::fstream file(m_Path + m_Name);
     if (!file.is_open())
         CLI::ErrorHandler(CLI::Error::INVALID_FILE_PATH);
-
+    std::cout << "yoink: " << CLI::Config::customAssetsDir + m_Name << std::endl;
     std::fstream templateFile(CLI::Config::customAssetsDir + m_Name, std::ios::out);
 
     std::cout << "task: add template " << m_Name << "           | ";
@@ -325,7 +334,7 @@ void CLI::Executor::List() const {
 }
 
 void CLI::Executor::ListCustomTemplateFiles() const {
-    std::cout << "react-cli provided templates:\n";
+    std::cout << "rtc provided templates:\n";
     for (const auto& file : std::filesystem::directory_iterator(CLI::Config::assetsDir)) {
         if (file.is_directory())
             continue;
