@@ -50,11 +50,11 @@ void CLI::Executor::Run(const int argc, const char* argv[]) {
 }
 
 void CLI::Executor::AddToHistory(int argc, const char* argv[]) const {
-    std::fstream history(CLI::Config::assetsDir + "history/history.txt", std::ios::out);
+    std::fstream history(CLI::Config::historyDir + "history.txt", std::ios::app);
     std::string cmd;
     int it = 0;
     while (it < argc) {
-        cmd += std::string(argv[it]);
+        cmd += std::string(argv[it]) + " ";
         it++;
     }
     history << cmd << "\n";
@@ -193,7 +193,7 @@ void CLI::Executor::GenerateComponent() {
         customTemplate = IsCustomTemplate(customTemplate);
         if (customTemplate.empty())
             CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
-        requestedTemplate = CLI::Config::customAssetsDir + customTemplate;
+        requestedTemplate = CLI::Config::customTemplatesDir+ customTemplate;
         componentFileExtension = customTemplate.substr(customTemplate.find_last_of('.'));
     }
 
@@ -209,11 +209,11 @@ void CLI::Executor::GenerateComponent() {
 
     std::fstream componentTemplate;
     if (customTemplate.empty())
-        componentTemplate.open(CLI::Config::assetsDir + "component-js.txt", std::ios::in);
+        componentTemplate.open(CLI::Config::templatesDir + "component-js.txt", std::ios::in);
     else
         componentTemplate.open(requestedTemplate, std::ios::in);
 
-    std::fstream componentTestTemplate(CLI::Config::assetsDir + "component-test-js.txt",
+    std::fstream componentTestTemplate(CLI::Config::templatesDir + "component-test-js.txt",
                                        std::ios::in);
 
     std::cout << "task: generating " << m_Name << ".jsx           | ";
@@ -226,7 +226,7 @@ void CLI::Executor::GenerateComponent() {
     if (css) {
         std::fstream componentStylesFile(m_Path + m_Name + ".css", std::ios::out);
         std::fstream componentStylesTemplate;
-        componentStylesTemplate.open(CLI::Config::assetsDir + "component-styles-css.txt",
+        componentStylesTemplate.open(CLI::Config::templatesDir + "component-styles-css.txt",
                                      std::ios::in);
         std::cout << "task: generating " << m_Name << ".css           | ";
         ApplyTemplate(componentStylesTemplate, componentStylesFile);
@@ -271,8 +271,7 @@ void CLI::Executor::AddTemplateFile() {
     std::fstream file(m_Path + m_Name);
     if (!file.is_open())
         CLI::ErrorHandler(CLI::Error::INVALID_FILE_PATH);
-    std::cout << "yoink: " << CLI::Config::customAssetsDir + m_Name << std::endl;
-    std::fstream templateFile(CLI::Config::customAssetsDir + m_Name, std::ios::out);
+    std::fstream templateFile(CLI::Config::customTemplatesDir + m_Name, std::ios::out);
 
     std::cout << "task: add template " << m_Name << "           | ";
     GenerateTemplate(file, templateFile);
@@ -284,7 +283,7 @@ std::string CLI::Executor::ExtractComponentName() const {
 }
 
 void CLI::Executor::Remove() {
-    if (m_Path != "" && m_Path != CLI::Config::customAssetsDir)
+    if (m_Path != "" && m_Path != CLI::Config::customTemplatesDir)
         CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
     if (IsCustomTemplate(CLI::Executor::Get().m_Name).empty())
         CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
@@ -303,7 +302,7 @@ void CLI::Executor::Remove() {
 }
 
 std::string CLI::Executor::IsCustomTemplate(const std::string& templateName) const {
-    for (const auto& file : std::filesystem::directory_iterator(CLI::Config::customAssetsDir)) {
+    for (const auto& file : std::filesystem::directory_iterator(CLI::Config::customTemplatesDir)) {
         const std::string path = std::string(file.path());
         const std::string name = path.substr(path.find_last_of("/") + 1);
         if (name.starts_with(templateName))
@@ -314,7 +313,7 @@ std::string CLI::Executor::IsCustomTemplate(const std::string& templateName) con
 
 void CLI::Executor::RemoveTemplateFile() {
     std::cout << "task: remove template " << m_Name << "           | ";
-    if (std::remove((CLI::Config::customAssetsDir + m_Name).c_str()) != 0)
+    if (std::remove((CLI::Config::customTemplatesDir + m_Name).c_str()) != 0)
         CLI::ErrorHandler(CLI::Error::UNKNOWN);
     std::cout << "DONE\n";
 }
@@ -335,7 +334,7 @@ void CLI::Executor::List() const {
 
 void CLI::Executor::ListCustomTemplateFiles() const {
     std::cout << "rtc provided templates:\n";
-    for (const auto& file : std::filesystem::directory_iterator(CLI::Config::assetsDir)) {
+    for (const auto& file : std::filesystem::directory_iterator(CLI::Config::templatesDir)) {
         if (file.is_directory())
             continue;
         const std::string path = std::string(file.path());
@@ -343,10 +342,10 @@ void CLI::Executor::ListCustomTemplateFiles() const {
         std::cout << "\t- " << name << "\n";
     }
     std::cout << std::endl;
-    if (std::filesystem::is_empty(CLI::Config::customAssetsDir))
+    if (std::filesystem::is_empty(CLI::Config::customTemplatesDir))
         CLI::ErrorHandler(CLI::Error::NO_CUSTOM_TEMPLATES_FOUND);
     std::cout << "Custom file templates:\n";
-    for (const auto& file : std::filesystem::directory_iterator(CLI::Config::customAssetsDir)) {
+    for (const auto& file : std::filesystem::directory_iterator(CLI::Config::customTemplatesDir)) {
         const std::string path = std::string(file.path());
         const std::string name = path.substr(path.find_last_of("/") + 1);
         std::cout << "\t- " << name << "\n";

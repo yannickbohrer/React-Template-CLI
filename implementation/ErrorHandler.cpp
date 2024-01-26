@@ -52,8 +52,8 @@ void CLI::ErrorHandler(CLI::Error err) {
             std::cerr << "An unknown error has occured\n";
     }
     if (syntaxErr)
-        std::cout << "required format: rtc [activity] [type] [name] [--flag]\n";
-    std::cout << "Calls that result in errors will not be added to history\n";
+        std::cout << "\nrequired format: rtc [activity] [type] [name] [--flag]\n";
+    std::cout << "\nCalls that result in errors will not be added to history\n";
 
     exit(EXIT_FAILURE);
 }

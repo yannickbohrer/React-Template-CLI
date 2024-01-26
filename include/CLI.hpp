@@ -20,13 +20,17 @@ inline const std::string fileTemplate = "template";
 
 // flags
 inline const std::string css = "css";
+
 }  // namespace Tokens
 
 namespace Config {
-inline const std::string assetsDir = std::string(ASSETS_DIR) + "/templates/";
-inline const std::string customAssetsDir = std::string(ASSETS_DIR) + "/templates/custom/";
+
+inline const std::string templatesDir = std::string(ASSETS_DIR) + "/templates/";
+inline const std::string customTemplatesDir = std::string(ASSETS_DIR) + "/templates/custom/";
+inline const std::string historyDir = std::string(ASSETS_DIR) + "/history/";
 inline const std::string templatePlaceholder = "%TEMPLATE_PLACEHOLDER%";
 inline const std::string flagPrefix = "--";
+
 }  // namespace Config
 
 enum class Error {
