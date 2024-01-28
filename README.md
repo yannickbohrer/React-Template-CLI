@@ -31,7 +31,7 @@ Flags:
 ### Important:
 - when adding a template file, the file name (without file extension) has to match component name exactly
 
-### Custom template directory:
+#### Assets Directory:
 ```bash
-~/.rtc/templates/custom/
+~/.rtc/
 ```

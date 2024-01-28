@@ -4,7 +4,7 @@
 #include "../include/Executor.hpp"
 
 void CLI::ErrorHandler(CLI::Error err) {
-    const auto& exec = CLI::Executor::Get();
+    const CLI::Executor& exec = CLI::Executor::Get();
     std::cerr << "\n--------------- Error ---------------\nMessage: ";
     bool syntaxErr = false;
     switch (err) {

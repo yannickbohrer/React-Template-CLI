@@ -1,8 +1,10 @@
 #include <unistd.h>
 #include <array>
+#include <ctime>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <tuple>
 #include <variant>
@@ -20,7 +22,7 @@ CLI::Executor& CLI::Executor::Get() {
 }
 
 std::array<std::string, 2> CLI::Executor::ExtractArgs(const int argc, const char* argv[]) {
-    auto& cli = CLI::Executor::Get();
+    CLI::Executor& cli = CLI::Executor::Get();
     std::array<std::string, 2> res;
     int it = 1, arrIdx = 0;
     while (it < argc) {
@@ -40,8 +42,8 @@ std::array<std::string, 2> CLI::Executor::ExtractArgs(const int argc, const char
 }
 
 void CLI::Executor::Run(const int argc, const char* argv[]) {
-    auto& cli = CLI::Executor::Get();
-    auto args = cli.ExtractArgs(argc, argv);
+    CLI::Executor& cli = CLI::Executor::Get();
+    std::array<std::string, 2> args = cli.ExtractArgs(argc, argv);
     cli.MatchActivity(std::string(std::get<0>(args)));
     if (*std::get_if<CLI::Activity>(&cli.m_Activity) != CLI::Activity::HISTORY)
         cli.MatchType(std::string(std::get<1>(args)));
@@ -52,6 +54,12 @@ void CLI::Executor::Run(const int argc, const char* argv[]) {
 void CLI::Executor::AddToHistory(int argc, const char* argv[]) const {
     std::fstream history(CLI::Config::historyDir + "history.txt", std::ios::app);
     std::string cmd;
+
+    const std::time_t t = std::time(nullptr);
+    std::ostringstream oss;
+    oss << std::put_time(std::localtime(&t), "%d.%m.%Y, %H:%M:%S");
+    cmd += "[" + oss.str() + "]: ";
+
     int it = 0;
     while (it < argc) {
         cmd += std::string(argv[it]) + " ";
@@ -103,11 +111,11 @@ std::tuple<std::string, std::string> CLI::Executor::SplitPathAndName() const {
 }
 
 void CLI::Executor::Execute() {
-    const auto pathAndName = SplitPathAndName();
+    const std::tuple<std::string, std::string> pathAndName = SplitPathAndName();
     m_Path = std::get<0>(pathAndName);
     m_Name = std::get<1>(pathAndName);
 
-    const auto* activity = std::get_if<CLI::Activity>(&m_Activity);
+    const CLI::Activity* activity = std::get_if<CLI::Activity>(&m_Activity);
 
     if (!activity)
         CLI::ErrorHandler(CLI::Error::UNKNOWN);
@@ -163,7 +171,7 @@ void CLI::Executor::GenerateTemplate(std::fstream& from, std::fstream& to) const
 }
 
 void CLI::Executor::Generate() {
-    const auto* type = std::get_if<CLI::Type>(&m_Type);
+    const CLI::Type* type = std::get_if<CLI::Type>(&m_Type);
     if (!type)
         CLI::ErrorHandler(CLI::Error::UNKNOWN);
 
@@ -193,7 +201,7 @@ void CLI::Executor::GenerateComponent() {
         customTemplate = IsCustomTemplate(customTemplate);
         if (customTemplate.empty())
             CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
-        requestedTemplate = CLI::Config::customTemplatesDir+ customTemplate;
+        requestedTemplate = CLI::Config::customTemplatesDir + customTemplate;
         componentFileExtension = customTemplate.substr(customTemplate.find_last_of('.'));
     }
 
@@ -254,7 +262,7 @@ void CLI::Executor::Add() {
     if (!m_Name.ends_with(".jsx") && !m_Name.ends_with(".tsx") && !m_Name.ends_with(".js") &&
         !m_Name.ends_with(".ts"))
         CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_REACT_COMPONENT);
-    const auto* type = std::get_if<CLI::Type>(&m_Type);
+    const CLI::Type* type = std::get_if<CLI::Type>(&m_Type);
     if (!type)
         CLI::ErrorHandler(CLI::Error::UNKNOWN);
 
@@ -288,7 +296,7 @@ void CLI::Executor::Remove() {
     if (IsCustomTemplate(CLI::Executor::Get().m_Name).empty())
         CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
 
-    const auto* type = std::get_if<CLI::Type>(&m_Type);
+    const CLI::Type* type = std::get_if<CLI::Type>(&m_Type);
     if (!type)
         CLI::ErrorHandler(CLI::Error::UNKNOWN);
 
@@ -302,6 +310,7 @@ void CLI::Executor::Remove() {
 }
 
 std::string CLI::Executor::IsCustomTemplate(const std::string& templateName) const {
+    // TODO std::filesystem::directory_entry
     for (const auto& file : std::filesystem::directory_iterator(CLI::Config::customTemplatesDir)) {
         const std::string path = std::string(file.path());
         const std::string name = path.substr(path.find_last_of("/") + 1);
@@ -319,7 +328,7 @@ void CLI::Executor::RemoveTemplateFile() {
 }
 
 void CLI::Executor::List() const {
-    const auto* type = std::get_if<CLI::Type>(&m_Type);
+    const CLI::Type* type = std::get_if<CLI::Type>(&m_Type);
     if (!type)
         CLI::ErrorHandler(CLI::Error::UNKNOWN);
 
@@ -334,6 +343,7 @@ void CLI::Executor::List() const {
 
 void CLI::Executor::ListCustomTemplateFiles() const {
     std::cout << "rtc provided templates:\n";
+    // TODO std::filesystem::directory_entry
     for (const auto& file : std::filesystem::directory_iterator(CLI::Config::templatesDir)) {
         if (file.is_directory())
             continue;
@@ -345,6 +355,7 @@ void CLI::Executor::ListCustomTemplateFiles() const {
     if (std::filesystem::is_empty(CLI::Config::customTemplatesDir))
         CLI::ErrorHandler(CLI::Error::NO_CUSTOM_TEMPLATES_FOUND);
     std::cout << "Custom file templates:\n";
+    // TODO std::filesystem::directory_entry
     for (const auto& file : std::filesystem::directory_iterator(CLI::Config::customTemplatesDir)) {
         const std::string path = std::string(file.path());
         const std::string name = path.substr(path.find_last_of("/") + 1);
@@ -353,5 +364,13 @@ void CLI::Executor::ListCustomTemplateFiles() const {
 }
 
 void CLI::Executor::History() const {
-    std::cout << "Your History\n\n";
+    std::fstream history(CLI::Config::historyDir + "history.txt", std::ios::in);
+    if (history.peek() == std::ifstream::traits_type::eof()) {
+        std::cout << "Your history is empty.\nStart using rtc to populate your history!\n";
+        return;
+    }
+    std::string line;
+    while (std::getline(history, line)) {
+        std::cout << line << "\n";
+    }
 }
