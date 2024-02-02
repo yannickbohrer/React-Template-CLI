@@ -21,6 +21,13 @@ inline const std::string fileTemplate = "template";
 // flags
 inline const std::string css = "css";
 inline const std::string typescript = "ts";
+inline const std::string test = "test";
+
+// templates
+inline const std::string componentTemplate = "component.txt";
+inline const std::string jsTestTemplate = "component-test-js.txt";
+inline const std::string tsTestTemplate = "component-test-js.txt";
+inline const std::string cssTemplate = "component-styles-css.txt";
 
 }  // namespace Tokens
 

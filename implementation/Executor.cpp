@@ -13,8 +13,7 @@
 #include "../include/ErrorHandler.hpp"
 #include "../include/Executor.hpp"
 
-CLI::Executor::Executor()
-    : m_Activity(std::monostate{}), m_Type(std::monostate{}), m_Path(""), m_Name("") {}
+CLI::Executor::Executor() : m_Activity(std::monostate{}), m_Type(std::monostate{}), m_Path(""), m_Name("") {}
 
 CLI::Executor& CLI::Executor::Get() {
     static Executor m_Instance;
@@ -28,15 +27,16 @@ std::array<std::string, 2> CLI::Executor::ExtractArgs(const int argc, const char
     while (it < argc) {
         const std::string arg = std::string(argv[it]);
         it++;
-        if (arg.starts_with(CLI::Config::flagPrefix)) {
+        if (arg.starts_with(CLI::Config::flagPrefix))
             cli.m_Flags.emplace_back(arg.substr(2, arg.length() - 2));
-        } else if (arrIdx < 2) {
+        else if (arrIdx < 2) {
             res.at(arrIdx) = arg;
             arrIdx++;
         } else if (arrIdx == 2) {
             cli.m_Path = arg;
             arrIdx++;
-        }
+        } else
+            CLI::ErrorHandler(CLI::Error::INVALID_FLAG_SYNTAX);
     }
     return res;
 }
@@ -55,9 +55,9 @@ void CLI::Executor::AddToHistory(int argc, const char* argv[]) const {
     std::fstream history(CLI::Config::historyDir + "history.txt", std::ios::app);
     std::string cmd;
 
-    const std::time_t t = std::time(nullptr);
+    const std::time_t time = std::time(nullptr);
     std::ostringstream oss;
-    oss << std::put_time(std::localtime(&t), "%d.%m.%Y, %H:%M:%S");
+    oss << std::put_time(std::localtime(&time), "%d.%m.%Y, %H:%M:%S");
     cmd += "[" + oss.str() + "]: ";
 
     int it = 0;
@@ -185,7 +185,9 @@ void CLI::Executor::Generate() {
 }
 
 void CLI::Executor::GenerateComponent() {
+    bool test = false;
     bool css = false;
+    bool ts = false;
     std::string componentFileExtension = ".jsx";
     std::string componentTestExtension = ".js";
     std::string customTemplate;
@@ -193,17 +195,19 @@ void CLI::Executor::GenerateComponent() {
     for (const std::string& flag : m_Flags) {
         if (flag == CLI::Tokens::css)
             css = true;
+        if (flag == CLI::Tokens::test)
+            test = true;
         if (flag == CLI::Tokens::typescript) {
             componentFileExtension = ".tsx";
             componentTestExtension = ".ts";
+            ts = true;
         }
         if (flag.starts_with(CLI::Tokens::fileTemplate))
-            customTemplate = flag.substr(flag.find_first_of('=') + 1,
-                                         flag.length() - CLI::Tokens::fileTemplate.length() - 1);
+            customTemplate =
+                flag.substr(flag.find_first_of('=') + 1, flag.length() - CLI::Tokens::fileTemplate.length() - 1);
     }
 
     std::string requestedTemplate;
-
     if (!customTemplate.empty()) {
         customTemplate = IsCustomTemplate(customTemplate);
         if (customTemplate.empty())
@@ -213,37 +217,39 @@ void CLI::Executor::GenerateComponent() {
     }
 
     GenerateRequiredDirectories();
-    std::filesystem::create_directory(m_Path + "tests/");
 
     std::fstream componentFile(m_Path + m_Name + componentFileExtension, std::ios::out);
     if (css) {
         const std::string componentName = ExtractComponentName();
         componentFile << "import './" << componentName << ".css'\n\n";
     }
-    std::fstream componentTestFile(m_Path + "tests/" + m_Name + ".test" + componentTestExtension,
-                                   std::ios::out);
 
     std::fstream componentTemplate;
     if (customTemplate.empty())
-        componentTemplate.open(CLI::Config::templatesDir + "component.txt", std::ios::in);
+        componentTemplate.open(CLI::Config::templatesDir + CLI::Tokens::componentTemplate, std::ios::in);
     else
         componentTemplate.open(requestedTemplate, std::ios::in);
-
-    std::fstream componentTestTemplate(CLI::Config::templatesDir + "component-test.txt",
-                                       std::ios::in);
 
     std::cout << "task: generating " << m_Name << componentFileExtension << "           | ";
     ApplyTemplate(componentTemplate, componentFile);
     std::cout << "DONE\n";
-    std::cout << "task: generating tests/" << m_Name << ".test" << componentTestExtension << " | ";
-    ApplyTemplate(componentTestTemplate, componentTestFile);
-    std::cout << "DONE\n";
+
+    if (test) {
+        std::filesystem::create_directory(m_Path + "tests/");
+        std::string relevantTemplate = CLI::Tokens::jsTestTemplate;
+        if (ts)
+            relevantTemplate = CLI::Tokens::tsTestTemplate;
+        std::fstream componentTestTemplate(CLI::Config::templatesDir + relevantTemplate, std::ios::in);
+        std::fstream componentTestFile(m_Path + "tests/" + m_Name + ".test" + componentTestExtension, std::ios::out);
+        std::cout << "task: generating tests/" << m_Name << ".test" << componentTestExtension << " | ";
+        ApplyTemplate(componentTestTemplate, componentTestFile);
+        std::cout << "DONE\n";
+    }
 
     if (css) {
         std::fstream componentStylesFile(m_Path + m_Name + ".css", std::ios::out);
         std::fstream componentStylesTemplate;
-        componentStylesTemplate.open(CLI::Config::templatesDir + "component-styles-css.txt",
-                                     std::ios::in);
+        componentStylesTemplate.open(CLI::Config::templatesDir + CLI::Tokens::cssTemplate, std::ios::in);
         std::cout << "task: generating " << m_Name << ".css           | ";
         ApplyTemplate(componentStylesTemplate, componentStylesFile);
         std::cout << "DONE\n";
@@ -267,8 +273,7 @@ void CLI::Executor::GenerateRequiredDirectories() const {
 }
 
 void CLI::Executor::Add() {
-    if (!m_Name.ends_with(".jsx") && !m_Name.ends_with(".tsx") && !m_Name.ends_with(".js") &&
-        !m_Name.ends_with(".ts"))
+    if (!m_Name.ends_with(".jsx") && !m_Name.ends_with(".tsx") && !m_Name.ends_with(".js") && !m_Name.ends_with(".ts"))
         CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_REACT_COMPONENT);
     const CLI::Type* type = std::get_if<CLI::Type>(&m_Type);
     if (!type)

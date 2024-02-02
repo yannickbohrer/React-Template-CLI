@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import %TEMPLATE_PLACEHOLDER% from '../%TEMPLATE_PLACEHOLDER%';
+import %TEMPLATE_PLACEHOLDER% from '../%TEMPLATE_PLACEHOLDER%.jsx';
 
 test('should render', () => {
   render(<%TEMPLATE_PLACEHOLDER% />);

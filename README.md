@@ -27,6 +27,8 @@ sudo make install
 Flags:
 - `--css`: Dedicated css file for component will be generated
 - `--template=CustomTemplate`: Use custom template for component generation. Not set: Standard template will be used
+- `--ts`: create .tsx component instead of (standard) .jsx. Test file (if generated) will adjust as well
+- `--test`: Generate test file along with component
 
 ### Important:
 - when adding a template file, the file name (without file extension) has to match component name exactly
