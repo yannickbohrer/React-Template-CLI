@@ -20,6 +20,7 @@ inline const std::string fileTemplate = "template";
 
 // flags
 inline const std::string css = "css";
+inline const std::string typescript = "ts";
 
 }  // namespace Tokens
 

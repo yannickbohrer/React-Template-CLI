@@ -186,17 +186,24 @@ void CLI::Executor::Generate() {
 
 void CLI::Executor::GenerateComponent() {
     bool css = false;
+    std::string componentFileExtension = ".jsx";
+    std::string componentTestExtension = ".js";
     std::string customTemplate;
+
     for (const std::string& flag : m_Flags) {
         if (flag == CLI::Tokens::css)
             css = true;
-        else if (flag.starts_with(CLI::Tokens::fileTemplate))
+        if (flag == CLI::Tokens::typescript) {
+            componentFileExtension = ".tsx";
+            componentTestExtension = ".ts";
+        }
+        if (flag.starts_with(CLI::Tokens::fileTemplate))
             customTemplate = flag.substr(flag.find_first_of('=') + 1,
                                          flag.length() - CLI::Tokens::fileTemplate.length() - 1);
     }
 
     std::string requestedTemplate;
-    std::string componentFileExtension = ".jsx";
+
     if (!customTemplate.empty()) {
         customTemplate = IsCustomTemplate(customTemplate);
         if (customTemplate.empty())
@@ -213,21 +220,22 @@ void CLI::Executor::GenerateComponent() {
         const std::string componentName = ExtractComponentName();
         componentFile << "import './" << componentName << ".css'\n\n";
     }
-    std::fstream componentTestFile(m_Path + "tests/" + m_Name + ".test.js", std::ios::out);
+    std::fstream componentTestFile(m_Path + "tests/" + m_Name + ".test" + componentTestExtension,
+                                   std::ios::out);
 
     std::fstream componentTemplate;
     if (customTemplate.empty())
-        componentTemplate.open(CLI::Config::templatesDir + "component-js.txt", std::ios::in);
+        componentTemplate.open(CLI::Config::templatesDir + "component.txt", std::ios::in);
     else
         componentTemplate.open(requestedTemplate, std::ios::in);
 
-    std::fstream componentTestTemplate(CLI::Config::templatesDir + "component-test-js.txt",
+    std::fstream componentTestTemplate(CLI::Config::templatesDir + "component-test.txt",
                                        std::ios::in);
 
-    std::cout << "task: generating " << m_Name << ".jsx           | ";
+    std::cout << "task: generating " << m_Name << componentFileExtension << "           | ";
     ApplyTemplate(componentTemplate, componentFile);
     std::cout << "DONE\n";
-    std::cout << "task: generating tests/" << m_Name << ".test.js | ";
+    std::cout << "task: generating tests/" << m_Name << ".test" << componentTestExtension << " | ";
     ApplyTemplate(componentTestTemplate, componentTestFile);
     std::cout << "DONE\n";
 
