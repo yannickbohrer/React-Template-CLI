@@ -5,9 +5,8 @@ Generate react components using generic out of the box templates, or generate re
 
 ### Requirements
 - cmake standard >= 3.25
-- Linux / MacOS (Windows not supported)
 
-### Installation
+### Installation Linux / MacOS
 ```bash
 git clone git@github.com:yannickbohrer/react-template-cli.git
 cd react-template-cli
