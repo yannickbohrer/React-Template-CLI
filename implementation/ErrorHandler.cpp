@@ -39,10 +39,6 @@ void CLI::ErrorHandler(CLI::Error err) {
             std::cerr << "Requested file is not a custom template\n"
                 << "Call 'rtc list template' for information on existing template files\n";
             break;
-        case CLI::Error::NO_CUSTOM_TEMPLATES_FOUND:
-            std::cerr << "Custom templates directory is empty\n"
-                << "Use 'rtc generate template path/to/MyExistingFile' to generate custom templates\n";
-            break;
         case CLI::Error::INVALID_FLAG_SYNTAX:
             std::cerr << "Invalid flag Syntax. Every flag has to begin with '--'\n";
             syntaxErr = true;
