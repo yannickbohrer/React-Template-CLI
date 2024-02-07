@@ -186,8 +186,7 @@ void CLI::Executor::GenerateRequiredDirectories() const {
 }
 
 std::string CLI::Executor::IsCustomTemplate(const std::string& templateName) const {
-    // TODO std::filesystem::directory_entry
-    for (const auto& file : std::filesystem::directory_iterator(CLI::Config::customTemplatesDir)) {
+    for (const std::filesystem::directory_entry& file : std::filesystem::directory_iterator(CLI::Config::customTemplatesDir)) {
         const std::string path = std::string(file.path());
         const std::string name = path.substr(path.find_last_of("/") + 1);
         if (name.starts_with(templateName))
@@ -356,8 +355,7 @@ void CLI::Executor::List() const {
 
 void CLI::Executor::ListCustomTemplateFiles() const {
     std::cout << "rtc provided templates:\n";
-    // TODO std::filesystem::directory_entry
-    for (const auto& file : std::filesystem::directory_iterator(CLI::Config::templatesDir)) {
+    for (const std::filesystem::directory_entry& file : std::filesystem::directory_iterator(CLI::Config::templatesDir)) {
         if (file.is_directory())
             continue;
         const std::string path = std::string(file.path());
@@ -368,8 +366,7 @@ void CLI::Executor::ListCustomTemplateFiles() const {
     if (std::filesystem::is_empty(CLI::Config::customTemplatesDir))
         CLI::ErrorHandler(CLI::Error::NO_CUSTOM_TEMPLATES_FOUND);
     std::cout << "Custom file templates:\n";
-    // TODO std::filesystem::directory_entry
-    for (const auto& file : std::filesystem::directory_iterator(CLI::Config::customTemplatesDir)) {
+    for (const std::filesystem::directory_entry& file : std::filesystem::directory_iterator(CLI::Config::customTemplatesDir)) {
         const std::string path = std::string(file.path());
         const std::string name = path.substr(path.find_last_of("/") + 1);
         std::cout << "\t- " << name << "\n";
