@@ -12,11 +12,8 @@ public:
     static Executor& Get();
     static void Run(const int, const char*[]);
 
-    std::string FilePath() const;
-    std::string FileName() const;
-
 private:
-    std::array<std::string, 2> ExtractArgs(const int, const char*[]);
+    std::array<std::string, 2> ParseArgs(const int, const char*[]);
     void MatchActivity(const std::string&);
     void MatchType(const std::string&);
     std::tuple<std::string, std::string> SplitPathAndName() const;

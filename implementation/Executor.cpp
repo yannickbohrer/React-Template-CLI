@@ -20,7 +20,25 @@ CLI::Executor& CLI::Executor::Get() {
     return m_Instance;
 }
 
-std::array<std::string, 2> CLI::Executor::ExtractArgs(const int argc, const char* argv[]) {
+void CLI::Executor::AddToHistory(int argc, const char* argv[]) const {
+    std::fstream history(CLI::Config::historyDir + "history.txt", std::ios::app);
+    std::string cmd;
+
+    const std::time_t time = std::time(nullptr);
+    std::ostringstream oss;
+    oss << std::put_time(std::localtime(&time), "%d.%m.%Y, %H:%M:%S");
+    cmd += "[" + oss.str() + "]: ";
+
+    int it = 0;
+    while (it < argc) {
+        cmd += std::string(argv[it]) + " ";
+        it++;
+    }
+    history << cmd << "\n";
+    history.close();
+}
+
+std::array<std::string, 2> CLI::Executor::ParseArgs(const int argc, const char* argv[]) {
     CLI::Executor& cli = CLI::Executor::Get();
     std::array<std::string, 2> res;
     int it = 1, arrIdx = 0;
@@ -43,38 +61,12 @@ std::array<std::string, 2> CLI::Executor::ExtractArgs(const int argc, const char
 
 void CLI::Executor::Run(const int argc, const char* argv[]) {
     CLI::Executor& cli = CLI::Executor::Get();
-    std::array<std::string, 2> args = cli.ExtractArgs(argc, argv);
+    std::array<std::string, 2> args = cli.ParseArgs(argc, argv);
     cli.MatchActivity(std::string(std::get<0>(args)));
     if (*std::get_if<CLI::Activity>(&cli.m_Activity) != CLI::Activity::HISTORY)
         cli.MatchType(std::string(std::get<1>(args)));
     cli.Execute();
     cli.AddToHistory(argc, argv);
-}
-
-void CLI::Executor::AddToHistory(int argc, const char* argv[]) const {
-    std::fstream history(CLI::Config::historyDir + "history.txt", std::ios::app);
-    std::string cmd;
-
-    const std::time_t time = std::time(nullptr);
-    std::ostringstream oss;
-    oss << std::put_time(std::localtime(&time), "%d.%m.%Y, %H:%M:%S");
-    cmd += "[" + oss.str() + "]: ";
-
-    int it = 0;
-    while (it < argc) {
-        cmd += std::string(argv[it]) + " ";
-        it++;
-    }
-    history << cmd << "\n";
-    history.close();
-}
-
-std::string CLI::Executor::FilePath() const {
-    return CLI::Executor::Get().m_Path;
-}
-
-std::string CLI::Executor::FileName() const {
-    return CLI::Executor::Get().m_Name;
 }
 
 void CLI::Executor::MatchActivity(const std::string& arg) {
@@ -141,6 +133,20 @@ void CLI::Executor::Execute() {
     }
 }
 
+void CLI::Executor::Generate() {
+    const CLI::Type* type = std::get_if<CLI::Type>(&m_Type);
+    if (!type)
+        CLI::ErrorHandler(CLI::Error::UNKNOWN);
+
+    switch (*type) {
+        case CLI::Type::COMPONENT:
+            GenerateComponent();
+            break;
+        default:
+            CLI::ErrorHandler(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
+    }
+}
+
 void CLI::Executor::ApplyTemplate(std::fstream& from, std::fstream& to) const {
     std::string line;
     while (std::getline(from, line)) {
@@ -155,33 +161,31 @@ void CLI::Executor::ApplyTemplate(std::fstream& from, std::fstream& to) const {
     to.close();
 }
 
-void CLI::Executor::GenerateTemplate(std::fstream& from, std::fstream& to) const {
-    const std::string componentName = ExtractComponentName();
-    std::string line;
-    while (std::getline(from, line)) {
-        std::size_t pos = line.find(componentName);
-        while (pos != std::string::npos) {
-            line.replace(pos, componentName.length(), CLI::Config::templatePlaceholder);
-            pos = line.find(componentName);
+void CLI::Executor::GenerateRequiredDirectories() const {
+    if (m_Path.empty() || m_Path == "./" || m_Path == "/")
+        return;
+    int itL = 0, itR = 0;
+    std::string lastDir = "";
+    while (itR < m_Path.length()) {
+        if (m_Path.at(itR) == '/') {
+            std::string nextDir = m_Path.substr(itL, itR - itL);
+            std::filesystem::create_directory(lastDir + nextDir);
+            lastDir += nextDir + '/';
+            itL = itR + 1;
         }
-        to << line << '\n';
+        itR++;
     }
-    from.close();
-    to.close();
 }
 
-void CLI::Executor::Generate() {
-    const CLI::Type* type = std::get_if<CLI::Type>(&m_Type);
-    if (!type)
-        CLI::ErrorHandler(CLI::Error::UNKNOWN);
-
-    switch (*type) {
-        case CLI::Type::COMPONENT:
-            GenerateComponent();
-            break;
-        default:
-            CLI::ErrorHandler(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
+std::string CLI::Executor::IsCustomTemplate(const std::string& templateName) const {
+    // TODO std::filesystem::directory_entry
+    for (const auto& file : std::filesystem::directory_iterator(CLI::Config::customTemplatesDir)) {
+        const std::string path = std::string(file.path());
+        const std::string name = path.substr(path.find_last_of("/") + 1);
+        if (name.starts_with(templateName))
+            return name;
     }
+    return "";
 }
 
 void CLI::Executor::GenerateComponent() {
@@ -256,22 +260,6 @@ void CLI::Executor::GenerateComponent() {
     }
 }
 
-void CLI::Executor::GenerateRequiredDirectories() const {
-    if (m_Path.empty() || m_Path == "./" || m_Path == "/")
-        return;
-    int itL = 0, itR = 0;
-    std::string lastDir = "";
-    while (itR < m_Path.length()) {
-        if (m_Path.at(itR) == '/') {
-            std::string nextDir = m_Path.substr(itL, itR - itL);
-            std::filesystem::create_directory(lastDir + nextDir);
-            lastDir += nextDir + '/';
-            itL = itR + 1;
-        }
-        itR++;
-    }
-}
-
 void CLI::Executor::Add() {
     if (!m_Name.ends_with(".jsx") && !m_Name.ends_with(".tsx") && !m_Name.ends_with(".js") && !m_Name.ends_with(".ts"))
         CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_REACT_COMPONENT);
@@ -286,6 +274,21 @@ void CLI::Executor::Add() {
         default:
             CLI::ErrorHandler(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
     }
+}
+
+void CLI::Executor::GenerateTemplate(std::fstream& from, std::fstream& to) const {
+    const std::string componentName = ExtractComponentName();
+    std::string line;
+    while (std::getline(from, line)) {
+        std::size_t pos = line.find(componentName);
+        while (pos != std::string::npos) {
+            line.replace(pos, componentName.length(), CLI::Config::templatePlaceholder);
+            pos = line.find(componentName);
+        }
+        to << line << '\n';
+    }
+    from.close();
+    to.close();
 }
 
 void CLI::Executor::AddTemplateFile() {
@@ -320,17 +323,6 @@ void CLI::Executor::Remove() {
         default:
             CLI::ErrorHandler(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
     }
-}
-
-std::string CLI::Executor::IsCustomTemplate(const std::string& templateName) const {
-    // TODO std::filesystem::directory_entry
-    for (const auto& file : std::filesystem::directory_iterator(CLI::Config::customTemplatesDir)) {
-        const std::string path = std::string(file.path());
-        const std::string name = path.substr(path.find_last_of("/") + 1);
-        if (name.starts_with(templateName))
-            return name;
-    }
-    return "";
 }
 
 void CLI::Executor::RemoveTemplateFile() {
@@ -387,3 +379,4 @@ void CLI::Executor::History() const {
         std::cout << line << "\n";
     }
 }
+
