@@ -46,7 +46,7 @@ void CLI::Executor::AddToHistory(int argc, const char* argv[]) const {
     history.close();
 }
 
-std::array<std::string, 2> CLI::Executor::ParseArgs(const int argc, const char* argv[]) {
+const std::array<std::string, 2> CLI::Executor::ParseArgs(const int argc, const char* argv[]) {
     CLI::Executor& cli = CLI::Executor::Get();
     std::array<std::string, 2> res;
     int it = 1, arrIdx = 0;
@@ -103,7 +103,7 @@ void CLI::Executor::MatchType(const std::string& arg) {
         CLI::ErrorHandler(CLI::Error::INVALID_TYPE);
 }
 
-std::tuple<std::string, std::string> CLI::Executor::SplitPathAndName() const {
+const std::tuple<std::string, std::string> CLI::Executor::SplitPathAndName() const {
     size_t pos = m_Path.find_last_of('/');
     if (pos != std::string::npos)
         return std::tuple(m_Path.substr(0, pos + 1), m_Path.substr(pos + 1));
@@ -185,7 +185,7 @@ void CLI::Executor::GenerateRequiredDirectories() const {
     }
 }
 
-std::string CLI::Executor::IsCustomTemplate(const std::string& templateName) const {
+const std::string CLI::Executor::IsCustomTemplate(const std::string& templateName) const {
     for (const std::filesystem::directory_entry& file :
          std::filesystem::directory_iterator(CLI::Config::customTemplatesDir)) {
         const std::string path = std::string(file.path());
@@ -310,7 +310,7 @@ void CLI::Executor::AddTemplateFile() {
     std::cout << "DONE\n";
 }
 
-std::string CLI::Executor::ExtractComponentName() const {
+const std::string CLI::Executor::ExtractComponentName() const {
     return m_Name.substr(0, m_Name.find_last_of("."));
 }
 

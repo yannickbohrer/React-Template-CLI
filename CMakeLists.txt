@@ -14,7 +14,7 @@ target_compile_definitions(rtc PRIVATE ASSETS_DIR="$ENV{HOME}/.rtc")
 
 install(TARGETS rtc DESTINATION bin)
 
-# create templates dir and clone assets/templates into it $ENV{FOO}
+# create templates dir and clone assets/templates
 install(CODE "file(MAKE_DIRECTORY \"$ENV{HOME}/.rtc/templates\")")
 install(CODE "file(MAKE_DIRECTORY \"$ENV{HOME}/.rtc/templates/custom\")")
 install(DIRECTORY assets/templates/ DESTINATION $ENV{HOME}/.rtc/templates)

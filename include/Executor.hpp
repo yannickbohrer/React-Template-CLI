@@ -16,10 +16,10 @@ public:
     const std::string FileName() const;
 
 private:
-    std::array<std::string, 2> ParseArgs(const int, const char*[]);
+    const std::array<std::string, 2> ParseArgs(const int, const char*[]);
     void MatchActivity(const std::string&);
     void MatchType(const std::string&);
-    std::tuple<std::string, std::string> SplitPathAndName() const;
+    const std::tuple<std::string, std::string> SplitPathAndName() const;
     void Execute();
     void ApplyTemplate(std::fstream&, std::fstream&) const;
     void GenerateTemplate(std::fstream&, std::fstream&) const;
@@ -30,11 +30,11 @@ private:
 
     void Add();
     void AddTemplateFile();
-    std::string ExtractComponentName() const;
+    const std::string ExtractComponentName() const;
 
     void Remove();
     void RemoveTemplateFile();
-    std::string IsCustomTemplate(const std::string&) const;
+    const std::string IsCustomTemplate(const std::string&) const;
 
     void List() const;
     void ListCustomTemplateFiles() const;
