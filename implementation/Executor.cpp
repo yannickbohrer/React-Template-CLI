@@ -20,6 +20,14 @@ CLI::Executor& CLI::Executor::Get() {
     return m_Instance;
 }
 
+const std::string CLI::Executor::FilePath() const {
+    return CLI::Executor::Get().m_Path;
+}
+
+const std::string CLI::Executor::FileName() const {
+    return CLI::Executor::Get().m_Name;
+}
+
 void CLI::Executor::AddToHistory(int argc, const char* argv[]) const {
     std::fstream history(CLI::Config::historyDir + "history.txt", std::ios::app);
     std::string cmd;
@@ -379,4 +387,3 @@ void CLI::Executor::History() const {
         std::cout << line << "\n";
     }
 }
-

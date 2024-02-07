@@ -12,6 +12,9 @@ public:
     static Executor& Get();
     static void Run(const int, const char*[]);
 
+    const std::string FilePath() const;
+    const std::string FileName() const;
+
 private:
     std::array<std::string, 2> ParseArgs(const int, const char*[]);
     void MatchActivity(const std::string&);
