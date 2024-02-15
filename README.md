@@ -34,7 +34,7 @@ Flags:
 - `--test`: Generate test file along with component. Will use or create (if not existent) test dir at component location 
 
 ### Important:
-- when adding a template file, the file name (without file extension) has to match component name exactly
+- when adding a template file, the component name has to include the file name (without file extension) exactly
 
 #### Assets Directory:
 ```bash
