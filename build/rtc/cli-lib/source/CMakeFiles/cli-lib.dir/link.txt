@@ -1,2 +1,0 @@
-/usr/bin/ar qc libcli-lib.a "CMakeFiles/cli-lib.dir/Executor.cpp.o" "CMakeFiles/cli-lib.dir/ErrorHandler.cpp.o"
-/usr/bin/ranlib libcli-lib.a
