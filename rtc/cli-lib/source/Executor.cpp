@@ -9,7 +9,7 @@
 #include <tuple>
 #include <variant>
 
-#include "../include/CLI.hpp"
+#include "../../include/CLI.hpp"
 #include "../include/ErrorHandler.hpp"
 #include "../include/Executor.hpp"
 

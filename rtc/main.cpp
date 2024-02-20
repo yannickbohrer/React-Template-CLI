@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include "include/CLI.hpp"
-#include "include/ErrorHandler.hpp"
-#include "include/Executor.hpp"
+#include "cli-lib/include/ErrorHandler.hpp"
+#include "cli-lib/include/Executor.hpp"
 
 int main(const int argc, const char* argv[]) {
     if (argc < 2)

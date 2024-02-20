@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG CMakeFiles/rtc.dir/__/rtc/main.cpp.o -o rtc  ../rtc/cli-lib/source/libcli-lib.a 

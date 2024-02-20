@@ -1,0 +1,5 @@
+/usr/local/bin/rtc
+/home/yanboh/.rtc/templates/component-test-js.txt
+/home/yanboh/.rtc/templates/component.txt
+/home/yanboh/.rtc/templates/component-styles-css.txt
+/home/yanboh/.rtc/templates/component-test-ts.txt
