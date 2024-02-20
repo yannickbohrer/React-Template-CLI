@@ -1,23 +1,25 @@
 cmake_minimum_required(VERSION 3.25)
+project(rtc VERSION 1.0 DESCRIPTION "")
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release")
 endif()
+message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 
-project(react-template-cli)
-set(CMAKE_CXX_STANDARD 20)
-add_executable(rtc main.cpp ./implementation/Executor.cpp
-                   ./implementation/ErrorHandler.cpp)
+add_library(cxx_setup INTERFACE)
+target_compile_features(cxx_setup INTERFACE cxx_std_20)
+target_include_directories(cxx_setup INTERFACE ${CMAKE_SOURCE_DIR})
+target_compile_definitions(cxx_setup INTERFACE ASSETS_DIR="$ENV{HOME}/.rtc")
 
-target_compile_features(rtc PRIVATE cxx_range_for)
-target_compile_definitions(rtc PRIVATE ASSETS_DIR="$ENV{HOME}/.rtc")
+add_subdirectory(${PROJECT_NAME})
+add_subdirectory(executables)
 
 install(TARGETS rtc DESTINATION bin)
 
 # create templates dir and clone assets/templates
 install(CODE "file(MAKE_DIRECTORY \"$ENV{HOME}/.rtc/templates\")")
 install(CODE "file(MAKE_DIRECTORY \"$ENV{HOME}/.rtc/templates/custom\")")
-install(DIRECTORY assets/templates/ DESTINATION $ENV{HOME}/.rtc/templates)
+install(DIRECTORY rtc/assets/templates/ DESTINATION $ENV{HOME}/.rtc/templates)
 
 # create history dir and create history file
 install(CODE "file(MAKE_DIRECTORY \"$ENV{HOME}/.rtc/history\")")

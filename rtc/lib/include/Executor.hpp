@@ -5,7 +5,7 @@
 #include <tuple>
 #include <variant>
 #include <vector>
-#include "CLI.hpp"
+#include "../../include/CLI.hpp"
 
 class CLI::Executor {
 public:
