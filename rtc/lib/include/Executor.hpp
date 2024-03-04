@@ -42,6 +42,9 @@ private:
     void History() const;
     void AddToHistory(int, const char*[]) const;
 
+    void Rename();
+    void RenameTemplate();
+
     Executor();
     Executor(const Executor&) = delete;
     static Executor m_Instance;
@@ -50,6 +53,7 @@ private:
     std::variant<std::monostate, CLI::Type> m_Type;
     std::string m_Path;
     std::string m_Name;
+    std::string m_NewNameForRename;
     std::vector<std::string> m_Flags;
 };
 

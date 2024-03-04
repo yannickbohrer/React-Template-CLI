@@ -12,7 +12,8 @@
 #include "../include/ErrorHandler.hpp"
 #include "../include/Executor.hpp"
 
-CLI::Executor::Executor() : m_Activity(std::monostate{}), m_Type(std::monostate{}), m_Path(""), m_Name("") {}
+CLI::Executor::Executor()
+    : m_Activity(std::monostate{}), m_Type(std::monostate{}), m_Path(""), m_Name(""), m_NewNameForRename("") {}
 
 CLI::Executor& CLI::Executor::Get() {
     static Executor m_Instance;
@@ -60,6 +61,9 @@ const std::array<std::string, 2> CLI::Executor::ParseArgs(const int argc, const 
         } else if (arrIdx == 2) {
             cli.m_Path = arg;
             arrIdx++;
+        } else if (arrIdx == 3) {
+            cli.m_NewNameForRename = arg;
+            arrIdx++;
         } else
             CLI::ErrorHandler(CLI::Error::INVALID_FLAG_SYNTAX);
     }
@@ -85,6 +89,8 @@ void CLI::Executor::MatchActivity(const std::string& arg) {
         m_Activity = CLI::Activity::REMOVE;
     else if (arg == CLI::Tokens::list)
         m_Activity = CLI::Activity::LIST;
+    else if (arg == CLI::Tokens::rename)
+        m_Activity = CLI::Activity::RENAME;
     else if (arg == CLI::Tokens::history)
         m_Activity = CLI::Activity::HISTORY;
 
@@ -131,6 +137,9 @@ void CLI::Executor::Execute() {
             break;
         case CLI::Activity::LIST:
             List();
+            break;
+        case CLI::Activity::RENAME:
+            Rename();
             break;
         case CLI::Activity::HISTORY:
             History();
@@ -377,6 +386,40 @@ void CLI::Executor::ListCustomTemplateFiles() const {
         const std::string name = path.substr(path.find_last_of("/") + 1);
         std::cout << "\t- " << name << "\n";
     }
+}
+
+void CLI::Executor::Rename() {
+    const CLI::Type* type = std::get_if<CLI::Type>(&m_Type);
+    if (!type)
+        CLI::ErrorHandler(CLI::Error::UNKNOWN);
+
+    switch (*type) {
+        case CLI::Type::TEMPLATE:
+            RenameTemplate();
+            break;
+        default:
+            CLI::ErrorHandler(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
+    }
+}
+
+void CLI::Executor::RenameTemplate() {
+    std::cout << "task: rename template " << m_Name << " to " << m_NewNameForRename << "           | ";
+    const std::string fileName = IsCustomTemplate(m_Name);
+    if (fileName.empty())
+        CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
+
+    const std::string oldFileExtension = fileName.substr(fileName.find_last_of('.'));
+    if (m_NewNameForRename.find('.') == std::string::npos)
+        m_NewNameForRename += oldFileExtension;
+    const std::string newFileExtension = m_NewNameForRename.substr(m_NewNameForRename.find_last_of('.'));
+    if (oldFileExtension != newFileExtension)
+        CLI::ErrorHandler(CLI::Error::NEW_FILE_EXTENSION_DOES_NOT_MATCH_OLD_EXTENSION);
+
+    const std::filesystem::path oldFilePath = std::filesystem::path(CLI::Config::customTemplatesDir + fileName);
+    const std::filesystem::path newFilePath =
+        std::filesystem::path(CLI::Config::customTemplatesDir + m_NewNameForRename);
+    std::filesystem::rename(oldFilePath, newFilePath);
+    std::cout << "DONE\n";
 }
 
 void CLI::Executor::History() const {

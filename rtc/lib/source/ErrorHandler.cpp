@@ -5,7 +5,7 @@
 
 void CLI::ErrorHandler(CLI::Error err) {
     const CLI::Executor& exec = CLI::Executor::Get();
-    std::cerr << "\n--------------- Error ---------------\nMessage: ";
+    std::cerr << "\n\n--------------- Error ---------------\nMessage: ";
     bool syntaxErr = false;
     switch (err) {
         case CLI::Error::NOT_ENOUGH_ARGUMENTS:
@@ -45,6 +45,9 @@ void CLI::ErrorHandler(CLI::Error err) {
             break;
         case CLI::Error::COULD_NOT_DELETE_CUSTOM_TEMPLATE:
             std::cerr << "Could not delete template file: " << CLI::Config::customTemplatesDir << exec.FileName() << "\n";
+            break;
+        case CLI::Error::NEW_FILE_EXTENSION_DOES_NOT_MATCH_OLD_EXTENSION:
+            std::cerr << "New file extension has to match the existing template file's file extension.\n";
             break;
         case CLI::Error::UNKNOWN:
         default:

@@ -24,9 +24,14 @@ sudo cmake --install build
 - `rtc add template path/to/MyExistingFile`
 - `rtc remove template MyTemplate`
 - `rtc list template`
+- `rtc rename template OldTemplateName NewTemplateName`
 - `rtc history`
 
-Flags:
+#### Information
+- Providing file extensions in `--template=MyTemplate` flag, `remove template MyTemplate` or `rename template MyTemplate NewName` is optional.
+- The file extension (`.tsx`/..) cannot be changed through renaming a template file.\
+
+#### Flags:
 - `--css`: Dedicated css file for component will be generated at component location
 - `--template=CustomTemplate`: Use custom template for component generation. Not set: Standard template will be used
 - `--ts`: create .tsx component instead of (standard) .jsx. Test file (if generated) will adjust as well

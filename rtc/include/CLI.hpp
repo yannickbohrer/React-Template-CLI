@@ -13,6 +13,7 @@ inline const std::string add = "add";
 inline const std::string remove = "remove";
 inline const std::string list = "list";
 inline const std::string history = "history";
+inline const std::string rename = "rename";
 
 // Types
 inline const std::string component = "component";
@@ -52,6 +53,7 @@ enum class Error {
     SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE,
     INVALID_FLAG_SYNTAX,
     COULD_NOT_DELETE_CUSTOM_TEMPLATE,
+    NEW_FILE_EXTENSION_DOES_NOT_MATCH_OLD_EXTENSION,
     UNKNOWN,
 };
 
@@ -61,6 +63,7 @@ enum class Activity {
     REMOVE,
     LIST,
     HISTORY,
+    RENAME,
 };
 
 enum class Type {
