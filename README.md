@@ -1,4 +1,4 @@
-# react-template-cli (rtc)
+# React-Template-CLI (rtc)
 
 rtc is a template driven cli tool for react development.\
 Generate component templates from your existing component files, or use generic out of the box templates when creating new components!\
