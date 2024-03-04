@@ -29,19 +29,22 @@ void CLI::ErrorHandler(CLI::Error err) {
             break;
         case CLI::Error::INSUFFICIENT_PERMISSIONS:
             std::cerr << "Insufficient Permissions!\n"
-                << "Fix available: Execute rtc with superuser privileges\n";
+                      << "Fix available: Execute rtc with superuser privileges\n";
             break;
         case CLI::Error::SELECTED_FILE_IS_NOT_REACT_COMPONENT:
-            std::cerr << exec.FilePath() << exec.FileName() <<" is not a React component\n"
-                << "Fix suggestion: check file extension\n";
+            std::cerr << exec.FilePath() << exec.FileName() << " is not a React component\n"
+                      << "Fix suggestion: check file extension\n";
             break;
         case CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE:
             std::cerr << "Requested file is not a custom template\n"
-                << "Call 'rtc list template' for information on existing template files\n";
+                      << "Call 'rtc list template' for information on existing template files\n";
             break;
         case CLI::Error::INVALID_FLAG_SYNTAX:
             std::cerr << "Invalid flag Syntax. Every flag has to begin with '--'\n";
             syntaxErr = true;
+            break;
+        case CLI::Error::COULD_NOT_DELETE_CUSTOM_TEMPLATE:
+            std::cerr << "Could not delete template file: " << CLI::Config::customTemplatesDir << exec.FileName() << "\n";
             break;
         case CLI::Error::UNKNOWN:
         default:

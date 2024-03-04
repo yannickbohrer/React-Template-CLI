@@ -33,7 +33,7 @@ private:
     const std::string ExtractComponentName() const;
 
     void Remove();
-    void RemoveTemplateFile();
+    void RemoveTemplateFile(const std::string&);
     const std::string IsCustomTemplate(const std::string&) const;
 
     void List() const;

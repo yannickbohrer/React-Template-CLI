@@ -316,7 +316,9 @@ const std::string CLI::Executor::ExtractComponentName() const {
 void CLI::Executor::Remove() {
     if (m_Path != "" && m_Path != CLI::Config::customTemplatesDir)
         CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
-    if (IsCustomTemplate(CLI::Executor::Get().m_Name).empty())
+
+    const std::string fileName = IsCustomTemplate(CLI::Executor::Get().m_Name);
+    if (fileName.empty())
         CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
 
     const CLI::Type* type = std::get_if<CLI::Type>(&m_Type);
@@ -325,17 +327,17 @@ void CLI::Executor::Remove() {
 
     switch (*type) {
         case CLI::Type::TEMPLATE:
-            RemoveTemplateFile();
+            RemoveTemplateFile(fileName);
             break;
         default:
             CLI::ErrorHandler(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
     }
 }
 
-void CLI::Executor::RemoveTemplateFile() {
+void CLI::Executor::RemoveTemplateFile(const std::string& fileName) {
     std::cout << "task: remove template " << m_Name << "           | ";
-    if (std::remove((CLI::Config::customTemplatesDir + m_Name).c_str()) != 0)
-        CLI::ErrorHandler(CLI::Error::UNKNOWN);
+    if (std::remove((CLI::Config::customTemplatesDir + fileName).c_str()) != 0)
+        CLI::ErrorHandler(CLI::Error::COULD_NOT_DELETE_CUSTOM_TEMPLATE);
     std::cout << "DONE\n";
 }
 
