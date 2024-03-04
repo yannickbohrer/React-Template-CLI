@@ -1,7 +1,10 @@
 # react-template-cli (rtc)
 
 rtc is a template driven cli tool for react development.\
-Generate react components using generic out of the box templates, or generate reusable templates from your existing component files!
+Generate component templates from your existing component files, or use generic out of the box templates when creating new components!\
+\
+rtc helps you get a new project up and running in no time by reusing different parts of former projects!\
+For example: Easily reuse the mobile header from your last application without having to reinvent the wheel!
 
 ### Requirements
 - cmake standard >= 3.25
@@ -27,18 +30,16 @@ sudo cmake --install build
 - `rtc rename template OldTemplateName NewTemplateName`
 - `rtc history`
 
-#### Information
-- Providing file extensions in `--template=MyTemplate` flag, `remove template MyTemplate` or `rename template MyTemplate NewName` is optional.
-- The file extension (`.tsx`/..) cannot be changed through renaming a template file.\
-
 #### Flags:
 - `--css`: Dedicated css file for component will be generated at component location
 - `--template=CustomTemplate`: Use custom template for component generation. Not set: Standard template will be used
-- `--ts`: create .tsx component instead of (standard) .jsx. Test file (if generated) will adjust as well
+- `--ts`: Create .tsx component instead of (standard) .jsx. Test file (if generated) will adjust as well
 - `--test`: Generate test file along with component. Will use or create (if not existent) test dir at component location 
 
 ### Important:
-- when adding a template file, the component name has to include the file name (without file extension) exactly
+- When adding a template file, the component name has to include the file name (without file extension) exactly
+- Providing file extensions in `--template=MyTemplate` flag, `remove template MyTemplate` or `rename template MyTemplate NewName` is optional.
+- The template file extension cannot be changed through renaming a template file.
 
 #### Assets Directory:
 ```bash
