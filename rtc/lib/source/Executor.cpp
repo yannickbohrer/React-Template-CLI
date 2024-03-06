@@ -74,9 +74,11 @@ void CLI::Executor::Run(const int argc, const char* argv[]) {
     CLI::Executor& cli = CLI::Executor::Get();
     std::array<std::string, 2> args = cli.ParseArgs(argc, argv);
     cli.MatchActivity(std::string(std::get<0>(args)));
-    if (*std::get_if<CLI::Activity>(&cli.m_Activity) != CLI::Activity::HISTORY)
-        cli.MatchType(std::string(std::get<1>(args)));
+    cli.MatchType(std::string(std::get<1>(args)));
     cli.Execute();
+    if (*std::get_if<CLI::Activity>(&cli.m_Activity) == CLI::Activity::CLEAR &&
+        *std::get_if<CLI::Type>(&cli.m_Type) == CLI::Type::HISTORY)
+        return;
     cli.AddToHistory(argc, argv);
 }
 
@@ -91,8 +93,10 @@ void CLI::Executor::MatchActivity(const std::string& arg) {
         m_Activity = CLI::Activity::LIST;
     else if (arg == CLI::Tokens::rename)
         m_Activity = CLI::Activity::RENAME;
-    else if (arg == CLI::Tokens::history)
-        m_Activity = CLI::Activity::HISTORY;
+    else if (arg == CLI::Tokens::print)
+        m_Activity = CLI::Activity::PRINT;
+    else if (arg == CLI::Tokens::clear)
+        m_Activity = CLI::Activity::CLEAR;
 
     if (std::holds_alternative<std::monostate>(m_Activity))
         CLI::ErrorHandler(CLI::Error::INVALID_ACTIVITY);
@@ -103,6 +107,8 @@ void CLI::Executor::MatchType(const std::string& arg) {
         m_Type = CLI::Type::COMPONENT;
     else if (arg == CLI::Tokens::fileTemplate)
         m_Type = CLI::Type::TEMPLATE;
+    else if (arg == CLI::Tokens::history)
+        m_Type = CLI::Type::HISTORY;
 
     if (std::holds_alternative<std::monostate>(m_Type))
         CLI::ErrorHandler(CLI::Error::INVALID_TYPE);
@@ -141,8 +147,11 @@ void CLI::Executor::Execute() {
         case CLI::Activity::RENAME:
             Rename();
             break;
-        case CLI::Activity::HISTORY:
-            History();
+        case CLI::Activity::PRINT:
+            Print();
+            break;
+        case CLI::Activity::CLEAR:
+            Clear();
             break;
         default:
             CLI::ErrorHandler(CLI::Error::UNKNOWN);
@@ -422,7 +431,21 @@ void CLI::Executor::RenameTemplate() {
     std::cout << "DONE\n";
 }
 
-void CLI::Executor::History() const {
+void CLI::Executor::Print() const {
+    const CLI::Type* type = std::get_if<CLI::Type>(&m_Type);
+    if (!type)
+        CLI::ErrorHandler(CLI::Error::UNKNOWN);
+
+    switch (*type) {
+        case CLI::Type::HISTORY:
+            PrintHistory();
+            break;
+        default:
+            CLI::ErrorHandler(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
+    }
+}
+
+void CLI::Executor::PrintHistory() const {
     std::fstream history(CLI::Config::historyDir + "history.txt", std::ios::in);
     if (history.peek() == std::ifstream::traits_type::eof()) {
         std::cout << "Your history is empty.\nStart using rtc to populate your history!\n";
@@ -432,4 +455,26 @@ void CLI::Executor::History() const {
     while (std::getline(history, line)) {
         std::cout << line << "\n";
     }
+}
+
+void CLI::Executor::Clear() const {
+    const CLI::Type* type = std::get_if<CLI::Type>(&m_Type);
+    if (!type)
+        CLI::ErrorHandler(CLI::Error::UNKNOWN);
+
+    switch (*type) {
+        case CLI::Type::HISTORY:
+            ClearHistory();
+            break;
+        default:
+            CLI::ErrorHandler(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
+    }
+}
+
+void CLI::Executor::ClearHistory() const {
+    std::cout << "task: clear history"
+              << "           | ";
+    std::fstream history(CLI::Config::historyDir + "history.txt", std::ios::out);
+    history.close();
+    std::cout << "DONE\n";
 }

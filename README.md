@@ -28,7 +28,8 @@ sudo cmake --install build
 - `rtc remove template MyTemplate`
 - `rtc list template`
 - `rtc rename template OldTemplateName NewTemplateName`
-- `rtc history`
+- `rtc print history`
+- `rtc clear history`
 
 #### Flags:
 - `--css`: Dedicated css file for component will be generated at component location

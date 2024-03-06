@@ -12,12 +12,14 @@ inline const std::string generate = "generate";
 inline const std::string add = "add";
 inline const std::string remove = "remove";
 inline const std::string list = "list";
-inline const std::string history = "history";
 inline const std::string rename = "rename";
+inline const std::string print = "print";
+inline const std::string clear = "clear";
 
 // Types
 inline const std::string component = "component";
 inline const std::string fileTemplate = "template";
+inline const std::string history = "history";
 
 // flags
 inline const std::string css = "css";
@@ -62,13 +64,15 @@ enum class Activity {
     ADD,
     REMOVE,
     LIST,
-    HISTORY,
+    PRINT,
+    CLEAR,
     RENAME,
 };
 
 enum class Type {
     COMPONENT,
     TEMPLATE,
+    HISTORY,
 };
 
 class Executor;

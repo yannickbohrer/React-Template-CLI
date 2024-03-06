@@ -39,11 +39,16 @@ private:
     void List() const;
     void ListCustomTemplateFiles() const;
 
-    void History() const;
-    void AddToHistory(int, const char*[]) const;
+    void Print() const;
+    void PrintHistory() const;
+
+    void Clear() const;
+    void ClearHistory() const;
 
     void Rename();
     void RenameTemplate();
+
+    void AddToHistory(int, const char*[]) const;
 
     Executor();
     Executor(const Executor&) = delete;
