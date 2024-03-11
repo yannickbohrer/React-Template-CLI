@@ -50,6 +50,8 @@ private:
 
     void AddToHistory(int, const char*[]) const;
 
+    void Help() const;
+
     Executor();
     Executor(const Executor&) = delete;
     static Executor m_Instance;
@@ -59,6 +61,7 @@ private:
     std::string m_Path;
     std::string m_Name;
     std::string m_NewNameForRename;
+    bool m_TypeRequired;
     std::vector<std::string> m_Flags;
 };
 
