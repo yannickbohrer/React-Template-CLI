@@ -1,5 +1,4 @@
-#ifndef EXECUTOR_HPP
-#define EXECUTOR_HPP
+#pragma once
 
 #include <string>
 #include <tuple>
@@ -64,5 +63,3 @@ private:
     bool m_TypeRequired;
     std::vector<std::string> m_Flags;
 };
-
-#endif

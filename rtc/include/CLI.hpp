@@ -1,5 +1,4 @@
-#ifndef CLI_HPP
-#define CLI_HPP
+#pragma once
 
 #include <string>
 
@@ -22,12 +21,12 @@ inline const std::string component = "component";
 inline const std::string fileTemplate = "template";
 inline const std::string history = "history";
 
-// flags
+// Flags
 inline const std::string css = "css";
 inline const std::string typescript = "ts";
 inline const std::string test = "test";
 
-// templates
+// rtc provided templates
 inline const std::string componentTemplate = "component.txt";
 inline const std::string jsTestTemplate = "component-test-js.txt";
 inline const std::string tsTestTemplate = "component-test-js.txt";
@@ -82,5 +81,3 @@ class Executor;
 void ErrorHandler(CLI::Error);
 
 }  // namespace CLI
-
-#endif
