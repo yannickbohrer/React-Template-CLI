@@ -1,0 +1,53 @@
+React-Template-CLI Version 1.0
+Build your own component library by generating reusable templates from your existing component files!
+
+----------
+
+SYNTAX
+
+rtc [activity] [type] [path] [--flags]
+
+----------
+
+AVAILABLE COMMANDS ([] indicate optional parameter)
+
+- rtc generate component path/to/MyComponent [--test] [--ts] [--css] [--template=CustomTemplate]
+    Generates component 'MyComponent' at the destination 'path/to/' with the options (== flags) you have selected
+
+- rtc add template path/to/MyExistingFile
+    Creates a reusable template file called 'MyExistingFile' from an existing component file at location 'path/to/'
+
+- rtc remove template MyTemplate
+    Deletes template file 'MyTemplate' that was created using 'rtc add template'
+
+- rtc list template
+    Prints a list of all templates that are currently available. rtc provided ones as well as custom templates 
+
+- rtc rename template OldTemplateName NewTemplateName
+    Renames a custom template file from 'OldTemplateName' to 'NewTemplateName'
+
+- rtc print history
+    Prints all rtc commands that were used since installation or last history clear
+
+- rtc clear history
+    Clears history
+
+----------
+
+FLAG EXPLENATIONS
+
+--css                       Dedicated css file for component will be generated at component location
+
+--template=CustomTemplate   Use custom template for component generation. Not set: Standard template will be used
+
+--ts                        Create .tsx component instead of (standard) .jsx. Test file (if generated) will adjust as well
+
+--test                      Generate test file along with component. Will use or create (if not existent) test dir at component location 
+
+----------
+
+IMPORTANT
+
+When adding a template file, the component name has to include the file name (without file extension) exactly
+Providing file extensions in `--template=MyTemplate` flag, `remove template MyTemplate` or `rename template MyTemplate NewName` is optional.
+The template file extension cannot be changed through renaming a template file.

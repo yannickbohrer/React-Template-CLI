@@ -25,4 +25,7 @@ install(DIRECTORY rtc/assets/templates/ DESTINATION $ENV{HOME}/.rtc/templates)
 install(CODE "file(MAKE_DIRECTORY \"$ENV{HOME}/.rtc/history\")")
 install(CODE "file(WRITE \"$ENV{HOME}/.rtc/history/history.txt\")")
 
+# clone help.txt file from assets
+install(FILES rtc/assets/help.txt DESTINATION $ENV{HOME}/.rtc)
+
 install(CODE "execute_process(COMMAND sudo chown -R $ENV{USER} $ENV{HOME}/.rtc)")

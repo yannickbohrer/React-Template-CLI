@@ -15,6 +15,7 @@ inline const std::string list = "list";
 inline const std::string rename = "rename";
 inline const std::string print = "print";
 inline const std::string clear = "clear";
+inline const std::string help = "help";
 
 // Types
 inline const std::string component = "component";
@@ -36,6 +37,7 @@ inline const std::string cssTemplate = "component-styles-css.txt";
 
 namespace Config {
 
+inline const std::string assetsDir = std::string(ASSETS_DIR);
 inline const std::string templatesDir = std::string(ASSETS_DIR) + "/templates/";
 inline const std::string customTemplatesDir = std::string(ASSETS_DIR) + "/templates/custom/";
 inline const std::string historyDir = std::string(ASSETS_DIR) + "/history/";
@@ -67,6 +69,7 @@ enum class Activity {
     PRINT,
     CLEAR,
     RENAME,
+    HELP,
 };
 
 enum class Type {
