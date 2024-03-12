@@ -56,7 +56,9 @@ void CLI::ErrorHandler(CLI::Error err) {
     }
     if (syntaxErr)
         std::cout << "\nrequired format: rtc [activity] [type] [name] [--flag]\n";
-    std::cout << "\nCalls that result in errors will not be added to history\n";
+    std::cout << "\nIf in doubt, please refer to 'rtc help' or the projects README.md page for further information on "
+                 "available functionality.\n"
+              << "Calls that result in errors will not be added to history\n";
 
     exit(EXIT_FAILURE);
 }
