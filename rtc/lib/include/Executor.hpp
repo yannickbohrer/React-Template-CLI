@@ -29,6 +29,7 @@ private:
 
     void Add();
     void AddTemplateFile();
+    void AddStylesFile();
     const std::string ExtractComponentName() const;
 
     void Remove();

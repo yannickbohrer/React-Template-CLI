@@ -50,6 +50,10 @@ void CLI::ErrorHandler(CLI::Error err) {
         case CLI::Error::NEW_FILE_EXTENSION_DOES_NOT_MATCH_OLD_EXTENSION:
             std::cerr << "New file extension has to match the existing template file's file extension.\n";
             break;
+        case CLI::Error::SELECTED_FILE_IS_NOT_A_STYLES_FILE:
+            std::cerr << exec.FilePath() << exec.FileName() << " is not a stylesheet."
+                      << "Fix suggestion: check file extension. Supported file types are: .css, .scss\n";
+            break;
         case CLI::Error::UNKNOWN:
         default:
             std::cerr << "An unknown error has occured\n";

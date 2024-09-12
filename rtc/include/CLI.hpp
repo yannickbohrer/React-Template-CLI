@@ -20,6 +20,7 @@ inline const std::string help = "help";
 inline const std::string component = "component";
 inline const std::string fileTemplate = "template";
 inline const std::string history = "history";
+inline const std::string styles = "styles";
 
 // Flags
 inline const std::string css = "css";
@@ -57,6 +58,7 @@ enum class Error {
     INVALID_FLAG_SYNTAX,
     COULD_NOT_DELETE_CUSTOM_TEMPLATE,
     NEW_FILE_EXTENSION_DOES_NOT_MATCH_OLD_EXTENSION,
+    SELECTED_FILE_IS_NOT_A_STYLES_FILE,
     UNKNOWN,
 };
 
@@ -75,6 +77,7 @@ enum class Type {
     COMPONENT,
     TEMPLATE,
     HISTORY,
+    STYLES,
 };
 
 class Executor;

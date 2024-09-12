@@ -119,6 +119,8 @@ void CLI::Executor::MatchType(const std::string& arg) {
         m_Type = CLI::Type::TEMPLATE;
     else if (arg == CLI::Tokens::history)
         m_Type = CLI::Type::HISTORY;
+    else if (arg == CLI::Tokens::styles)
+        m_Type = CLI::Type::STYLES;
 
     if (std::holds_alternative<std::monostate>(m_Type))
         CLI::ErrorHandler(CLI::Error::INVALID_TYPE);
@@ -299,8 +301,6 @@ void CLI::Executor::GenerateComponent() {
 }
 
 void CLI::Executor::Add() {
-    if (!m_Name.ends_with(".jsx") && !m_Name.ends_with(".tsx") && !m_Name.ends_with(".js") && !m_Name.ends_with(".ts"))
-        CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_REACT_COMPONENT);
     const CLI::Type* type = std::get_if<CLI::Type>(&m_Type);
     if (!type)
         CLI::ErrorHandler(CLI::Error::UNKNOWN);
@@ -308,6 +308,9 @@ void CLI::Executor::Add() {
     switch (*type) {
         case CLI::Type::TEMPLATE:
             AddTemplateFile();
+            break;
+        case CLI::Type::STYLES:
+            AddStylesFile();
             break;
         default:
             CLI::ErrorHandler(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
@@ -330,6 +333,8 @@ void CLI::Executor::GenerateTemplate(std::fstream& from, std::fstream& to) const
 }
 
 void CLI::Executor::AddTemplateFile() {
+    if (!m_Name.ends_with(".jsx") && !m_Name.ends_with(".tsx") && !m_Name.ends_with(".js") && !m_Name.ends_with(".ts"))
+        CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_REACT_COMPONENT);
     std::fstream file(m_Path + m_Name);
     if (!file.is_open())
         CLI::ErrorHandler(CLI::Error::INVALID_FILE_PATH);
@@ -441,6 +446,19 @@ void CLI::Executor::RenameTemplate() {
     const std::filesystem::path newFilePath =
         std::filesystem::path(CLI::Config::customTemplatesDir + m_NewNameForRename);
     std::filesystem::rename(oldFilePath, newFilePath);
+    std::cout << "DONE\n";
+}
+
+void CLI::Executor::AddStylesFile() {
+    if (!m_Name.ends_with(".css") && !m_Name.ends_with(".scss"))
+        CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_A_STYLES_FILE);
+    std::fstream file(m_Path + m_Name);
+    if (!file.is_open())
+        CLI::ErrorHandler(CLI::Error::INVALID_FILE_PATH);
+    std::fstream templateFile(CLI::Config::customTemplatesDir + m_Name, std::ios::out);
+
+    std::cout << "task: add stylesheet " << m_Name << "           | ";
+    GenerateTemplate(file, templateFile);
     std::cout << "DONE\n";
 }
 
