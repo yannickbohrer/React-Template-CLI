@@ -497,19 +497,6 @@ void CLI::Executor::RenameTemplate() {
     std::cout << "DONE\n";
 }
 
-void CLI::Executor::AddStylesFile() {
-    if (!m_Name.ends_with(".css") && !m_Name.ends_with(".scss"))
-        CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_A_STYLES_FILE);
-    std::fstream file(m_Path + m_Name);
-    if (!file.is_open())
-        CLI::ErrorHandler(CLI::Error::INVALID_FILE_PATH);
-    std::fstream templateFile(CLI::Config::customTemplatesDir + m_Name, std::ios::out);
-
-    std::cout << "task: add stylesheet " << m_Name << "           | ";
-    GenerateTemplate(file, templateFile);
-    std::cout << "DONE\n";
-}
-
 void CLI::Executor::Print() const {
     const CLI::Type* type = std::get_if<CLI::Type>(&m_Type);
     if (!type)
