@@ -20,12 +20,12 @@ inline const std::string help = "help";
 inline const std::string component = "component";
 inline const std::string fileTemplate = "template";
 inline const std::string history = "history";
-inline const std::string styles = "styles";
 
 // Flags
 inline const std::string css = "css";
 inline const std::string typescript = "ts";
 inline const std::string test = "test";
+inline const std::string styles = "styles";
 
 // rtc provided templates
 inline const std::string componentTemplate = "component.txt";
@@ -59,6 +59,7 @@ enum class Error {
     COULD_NOT_DELETE_CUSTOM_TEMPLATE,
     NEW_FILE_EXTENSION_DOES_NOT_MATCH_OLD_EXTENSION,
     SELECTED_FILE_IS_NOT_A_STYLES_FILE,
+    TOO_MANY_STYLES_FILES_REQUESTED,
     UNKNOWN,
 };
 

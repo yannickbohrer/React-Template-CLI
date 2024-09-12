@@ -1,4 +1,5 @@
 #include <array>
+#include <vector>
 #include <ctime>
 #include <filesystem>
 #include <fstream>
@@ -119,8 +120,6 @@ void CLI::Executor::MatchType(const std::string& arg) {
         m_Type = CLI::Type::TEMPLATE;
     else if (arg == CLI::Tokens::history)
         m_Type = CLI::Type::HISTORY;
-    else if (arg == CLI::Tokens::styles)
-        m_Type = CLI::Type::STYLES;
 
     if (std::holds_alternative<std::monostate>(m_Type))
         CLI::ErrorHandler(CLI::Error::INVALID_TYPE);
@@ -130,6 +129,7 @@ const std::tuple<std::string, std::string> CLI::Executor::SplitPathAndName() con
     size_t pos = m_Path.find_last_of('/');
     if (pos != std::string::npos)
         return std::tuple(m_Path.substr(0, pos + 1), m_Path.substr(pos + 1));
+
     return std::tuple("", m_Path);
 }
 
@@ -229,35 +229,56 @@ const std::string CLI::Executor::IsCustomTemplate(const std::string& templateNam
 }
 
 void CLI::Executor::GenerateComponent() {
+    bool ts = false;
     bool test = false;
     bool css = false;
-    bool ts = false;
+    bool customStyles = false;
     std::string componentFileExtension = ".jsx";
     std::string componentTestExtension = ".js";
-    std::string customTemplate;
+    std::string customComponentTemplate;
+    std::string customStylesTemplate;
+    std::string stylesFileExtension;
 
     for (const std::string& flag : m_Flags) {
-        if (flag == CLI::Tokens::css)
-            css = true;
-        if (flag == CLI::Tokens::test)
-            test = true;
         if (flag == CLI::Tokens::typescript) {
             componentFileExtension = ".tsx";
             componentTestExtension = ".ts";
             ts = true;
         }
+        if (flag == CLI::Tokens::test)
+            test = true;
+        if (flag == CLI::Tokens::css)
+            css = true;
+
         if (flag.starts_with(CLI::Tokens::fileTemplate))
-            customTemplate =
+            customComponentTemplate =
                 flag.substr(flag.find_first_of('=') + 1, flag.length() - CLI::Tokens::fileTemplate.length() - 1);
+        if (flag.starts_with(CLI::Tokens::styles)) {
+            customStyles = true;
+            customStylesTemplate =
+                flag.substr(flag.find_first_of('=') + 1, flag.length() - CLI::Tokens::styles.length() - 1);
+        }
+
+        if (css && customStyles)
+            CLI::ErrorHandler(CLI::Error::TOO_MANY_STYLES_FILES_REQUESTED);
     }
 
-    std::string requestedTemplate;
-    if (!customTemplate.empty()) {
-        customTemplate = IsCustomTemplate(customTemplate);
-        if (customTemplate.empty())
+    std::string requestedComponentTemplate;
+    if (!customComponentTemplate.empty()) {
+        customComponentTemplate = IsCustomTemplate(customComponentTemplate);
+        if (customComponentTemplate.empty())
             CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
-        requestedTemplate = CLI::Config::customTemplatesDir + customTemplate;
-        componentFileExtension = customTemplate.substr(customTemplate.find_last_of('.'));
+        requestedComponentTemplate = CLI::Config::customTemplatesDir + customComponentTemplate;
+        componentFileExtension = customComponentTemplate.substr(customComponentTemplate.find_last_of('.'));
+    }
+
+    std::string requestedStylesTemplate;
+    if (!customStylesTemplate.empty()) {
+        customStylesTemplate = IsCustomTemplate(customStylesTemplate);
+        if (customStylesTemplate.empty())
+            CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE);
+        requestedStylesTemplate = CLI::Config::customTemplatesDir + customStylesTemplate;
+        stylesFileExtension = customStylesTemplate.substr(customStylesTemplate.find_last_of('.'));
     }
 
     GenerateRequiredDirectories();
@@ -269,10 +290,10 @@ void CLI::Executor::GenerateComponent() {
     }
 
     std::fstream componentTemplate;
-    if (customTemplate.empty())
+    if (customComponentTemplate.empty())
         componentTemplate.open(CLI::Config::templatesDir + CLI::Tokens::componentTemplate, std::ios::in);
     else
-        componentTemplate.open(requestedTemplate, std::ios::in);
+        componentTemplate.open(requestedComponentTemplate, std::ios::in);
 
     std::cout << "task: generating " << m_Name << componentFileExtension << "           | ";
     ApplyTemplate(componentTemplate, componentFile);
@@ -298,6 +319,31 @@ void CLI::Executor::GenerateComponent() {
         ApplyTemplate(componentStylesTemplate, componentStylesFile);
         std::cout << "DONE\n";
     }
+    
+    if (customStyles) {
+        std::fstream stylesTemplate;
+        stylesTemplate.open(requestedStylesTemplate, std::ios::in);
+        std::fstream componentStylesFile(m_Path + m_Name + stylesFileExtension, std::ios::out);
+        std::cout << "task: generating " << m_Name << stylesFileExtension << "           | ";
+        ApplyTemplate(stylesTemplate, componentStylesFile);
+
+        componentFile.open(m_Path + m_Name + componentFileExtension, std::ios::in);
+        std::vector<std::string> componentFileContents;
+        std::string lineBuffer;
+
+        const std::string adjustedStylesFilePath = requestedStylesTemplate.substr(requestedStylesTemplate.find_last_of("/") + 1);
+        componentFileContents.emplace_back(std::string("import './" + adjustedStylesFilePath +  "'"));
+        while(std::getline(componentFile, lineBuffer)) {
+            componentFileContents.emplace_back(lineBuffer);
+        }
+        componentFile.close();
+        componentFile.open(m_Path + m_Name + componentFileExtension, std::ios::out);
+        for (const std::string& line : componentFileContents) {
+            componentFile << line << '\n';
+        }
+        componentFile.close();
+        std::cout << "DONE\n";
+    }
 }
 
 void CLI::Executor::Add() {
@@ -308,9 +354,6 @@ void CLI::Executor::Add() {
     switch (*type) {
         case CLI::Type::TEMPLATE:
             AddTemplateFile();
-            break;
-        case CLI::Type::STYLES:
-            AddStylesFile();
             break;
         default:
             CLI::ErrorHandler(CLI::Error::INVALID_TYPE_FOR_ACTIVITY);
@@ -333,8 +376,13 @@ void CLI::Executor::GenerateTemplate(std::fstream& from, std::fstream& to) const
 }
 
 void CLI::Executor::AddTemplateFile() {
-    if (!m_Name.ends_with(".jsx") && !m_Name.ends_with(".tsx") && !m_Name.ends_with(".js") && !m_Name.ends_with(".ts"))
-        CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_REACT_COMPONENT);
+    for (const std::string& flag : m_Flags)
+        if (flag.starts_with(CLI::Tokens::styles))
+            if (!flag.ends_with(".css") && !flag.ends_with(".scss"))
+                CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_A_STYLES_FILE);
+        if (!m_Name.ends_with(".jsx") && !m_Name.ends_with(".tsx") && !m_Name.ends_with(".js") && !m_Name.ends_with(".ts"))
+            CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_REACT_COMPONENT);
+
     std::fstream file(m_Path + m_Name);
     if (!file.is_open())
         CLI::ErrorHandler(CLI::Error::INVALID_FILE_PATH);

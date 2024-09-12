@@ -51,11 +51,11 @@ void CLI::ErrorHandler(CLI::Error err) {
             std::cerr << "New file extension has to match the existing template file's file extension\n";
             break;
         case CLI::Error::SELECTED_FILE_IS_NOT_A_STYLES_FILE:
-            std::cerr << exec.FilePath() << exec.FileName() << " is not a stylesheet"
+            std::cerr << exec.FilePath() << exec.FileName() << " is not a stylesheet."
                       << "Fix suggestion: check file extension. Supported file types are: .css, .scss\n";
             break;
         case CLI::Error::TOO_MANY_STYLES_FILES_REQUESTED:
-            std::cerr << "Too many styles files requested\n"
+            std::cerr << "Too many styles files requested.\n"
                 << "Please either chose a custom styles template, or generate a generic one - not both\n";
             break;
         case CLI::Error::UNKNOWN:
