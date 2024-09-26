@@ -376,12 +376,14 @@ void CLI::Executor::GenerateTemplate(std::fstream& from, std::fstream& to) const
 }
 
 void CLI::Executor::AddTemplateFile() {
-    for (const std::string& flag : m_Flags)
-        if (flag.starts_with(CLI::Tokens::styles))
-            if (!flag.ends_with(".css") && !flag.ends_with(".scss"))
-                CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_A_STYLES_FILE);
-        if (!m_Name.ends_with(".jsx") && !m_Name.ends_with(".tsx") && !m_Name.ends_with(".js") && !m_Name.ends_with(".ts"))
+    const bool isReactComponent = m_Name.ends_with(".jsx") || m_Name.ends_with(".tsx") || m_Name.ends_with(".js") || m_Name.ends_with(".ts");
+    const bool isStylesFile = m_Name.ends_with(".css") || m_Name.ends_with(".scss");
+    if (!isReactComponent && !isStylesFile) {
+        if (!isReactComponent)
             CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_REACT_COMPONENT);
+        if (!isStylesFile)
+            CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_A_STYLES_FILE);
+    }
 
     std::fstream file(m_Path + m_Name);
     if (!file.is_open())
@@ -452,7 +454,7 @@ void CLI::Executor::ListCustomTemplateFiles() const {
     std::cout << "\nCustom file templates:\n";
     if (std::filesystem::is_empty(CLI::Config::customTemplatesDir)) {
         std::cout << "\tCustom templates directory is empty!\n"
-                  << "\nUse 'rtc generate template path/to/MyExistingFile' to generate custom templates\n";
+                  << "\nUse 'rtc add template path/to/MyExistingFile' to add custom templates\n";
         return;
     }
     for (const std::filesystem::directory_entry& file :
