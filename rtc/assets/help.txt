@@ -11,7 +11,7 @@ rtc [activity] [type] [path] [--flags]
 
 AVAILABLE COMMANDS ([] indicate optional parameter)
 
-- rtc generate component path/to/MyComponent [--test] [--ts] [--css] [--template=CustomTemplate]
+- rtc generate component path/to/MyComponent [--test] [--ts] [--css] [--template=CustomComponentTemplate] [--styles=CustomStylesTemplate]
     Generates component 'MyComponent' at the destination 'path/to/' with the options (== flags) you have selected
 
 - rtc add template path/to/MyExistingFile
@@ -36,18 +36,20 @@ AVAILABLE COMMANDS ([] indicate optional parameter)
 
 FLAG EXPLENATIONS
 
---css                       Dedicated css file for component will be generated at component location
+--css                                   Dedicated css file for component will be generated at component location
 
---template=CustomTemplate   Use custom template for component generation. Not set: Standard template will be used
+--template=CustomComponentTemplate      Use custom template for component generation. Not set: Standard template will be used
 
---ts                        Create .tsx component instead of (standard) .jsx. Test file (if generated) will adjust as well
+--styles=CustomStylesTemplate           Use custom template for component generation. Not set: Standard template will be used
 
---test                      Generate test file along with component. Will use or create (if not existent) test dir at component location 
+--ts                                    Create .tsx component instead of (standard) .jsx. Test file (if generated) will adjust as well
+
+--test                                  Generate test file along with component. Will use or create (if not existent) test dir at component location 
 
 ----------
 
 IMPORTANT
 
 When adding a template file, the component name has to include the file name (without file extension) exactly
-Providing file extensions in `--template=MyTemplate` flag, `remove template MyTemplate` or `rename template MyTemplate NewName` is optional.
+Providing file extensions in `--template=MyComponentComponentTemplate` flag, `remove template MyTemplate` or `rename template MyTemplate NewName` is optional.
 The template file extension cannot be changed through renaming a template file.
