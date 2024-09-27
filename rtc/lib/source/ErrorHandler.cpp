@@ -31,9 +31,9 @@ void CLI::ErrorHandler(CLI::Error err) {
             std::cerr << "Insufficient Permissions!\n"
                       << "Fix available: Execute rtc with superuser privileges\n";
             break;
-        case CLI::Error::SELECTED_FILE_IS_NOT_REACT_COMPONENT:
-            std::cerr << exec.FilePath() << exec.FileName() << " is not a React component\n"
-                      << "Fix suggestion: check file extension\n";
+        case CLI::Error::SELECTED_FILE_IS_NOT_SUITABLE_AS_TEMPLATE:
+            std::cerr << exec.FilePath() << exec.FileName() << " is not suitable as a template.\n"
+                      << "Supported file types are: .ts, .tsx, .js, .jsx, .css, .scss\n";
             break;
         case CLI::Error::SELECTED_FILE_IS_NOT_A_CUSTOM_TEMPLATE:
             std::cerr << "Requested file is not a custom template\n"
@@ -50,13 +50,9 @@ void CLI::ErrorHandler(CLI::Error err) {
         case CLI::Error::NEW_FILE_EXTENSION_DOES_NOT_MATCH_OLD_EXTENSION:
             std::cerr << "New file extension has to match the existing template file's file extension\n";
             break;
-        case CLI::Error::SELECTED_FILE_IS_NOT_A_STYLES_FILE:
-            std::cerr << exec.FilePath() << exec.FileName() << " is not a stylesheet"
-                      << "Fix suggestion: check file extension. Supported file types are: .css, .scss\n";
-            break;
         case CLI::Error::TOO_MANY_STYLES_FILES_REQUESTED:
             std::cerr << "Too many styles files requested\n"
-                << "Please either chose a custom styles template, or generate a generic one - not both\n";
+                      << "Please either chose a custom styles template, or generate a generic one - not both\n";
             break;
         case CLI::Error::UNKNOWN:
         default:

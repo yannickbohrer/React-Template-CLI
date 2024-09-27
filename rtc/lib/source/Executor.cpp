@@ -1,5 +1,4 @@
 #include <array>
-#include <vector>
 #include <ctime>
 #include <filesystem>
 #include <fstream>
@@ -8,6 +7,7 @@
 #include <string>
 #include <tuple>
 #include <variant>
+#include <vector>
 
 #include "../../include/CLI.hpp"
 #include "../include/ErrorHandler.hpp"
@@ -319,7 +319,7 @@ void CLI::Executor::GenerateComponent() {
         ApplyTemplate(componentStylesTemplate, componentStylesFile);
         std::cout << "DONE\n";
     }
-    
+
     if (customStyles) {
         std::fstream stylesTemplate;
         stylesTemplate.open(requestedStylesTemplate, std::ios::in);
@@ -331,9 +331,10 @@ void CLI::Executor::GenerateComponent() {
         std::vector<std::string> componentFileContents;
         std::string lineBuffer;
 
-        const std::string adjustedStylesFilePath = requestedStylesTemplate.substr(requestedStylesTemplate.find_last_of("/") + 1);
-        componentFileContents.emplace_back(std::string("import './" + adjustedStylesFilePath +  "'"));
-        while(std::getline(componentFile, lineBuffer)) {
+        const std::string adjustedStylesFilePath =
+            requestedStylesTemplate.substr(requestedStylesTemplate.find_last_of("/") + 1);
+        componentFileContents.emplace_back(std::string("import './" + adjustedStylesFilePath + "'"));
+        while (std::getline(componentFile, lineBuffer)) {
             componentFileContents.emplace_back(lineBuffer);
         }
         componentFile.close();
@@ -376,14 +377,11 @@ void CLI::Executor::GenerateTemplate(std::fstream& from, std::fstream& to) const
 }
 
 void CLI::Executor::AddTemplateFile() {
-    const bool isReactComponent = m_Name.ends_with(".jsx") || m_Name.ends_with(".tsx") || m_Name.ends_with(".js") || m_Name.ends_with(".ts");
+    const bool isReactComponent =
+        m_Name.ends_with(".jsx") || m_Name.ends_with(".tsx") || m_Name.ends_with(".js") || m_Name.ends_with(".ts");
     const bool isStylesFile = m_Name.ends_with(".css") || m_Name.ends_with(".scss");
-    if (!isReactComponent && !isStylesFile) {
-        if (!isReactComponent)
-            CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_REACT_COMPONENT);
-        if (!isStylesFile)
-            CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_A_STYLES_FILE);
-    }
+    if (!isReactComponent && !isStylesFile)
+        CLI::ErrorHandler(CLI::Error::SELECTED_FILE_IS_NOT_SUITABLE_AS_TEMPLATE);
 
     std::fstream file(m_Path + m_Name);
     if (!file.is_open())
@@ -542,8 +540,7 @@ void CLI::Executor::Clear() const {
 }
 
 void CLI::Executor::ClearHistory() const {
-    std::cout << "task: clear history"
-              << "           | ";
+    std::cout << "task: clear history" << "           | ";
     std::fstream history(CLI::Config::historyDir + "history.txt", std::ios::out);
     history.close();
     std::cout << "DONE\n";
