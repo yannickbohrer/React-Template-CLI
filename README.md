@@ -1,3 +1,5 @@
+![image](./rtc-wallpaper.webp)
+
 # React-Template-CLI (rtc)
 
 rtc is a template driven cli tool for react development.
@@ -6,7 +8,7 @@ rtc is a template driven cli tool for react development.
 Generate component templates from your existing component files, or use generic out of the box templates when creating new components!
 
 rtc helps you get a new project up and running in no time by reusing different parts of former projects!\
-For example: Easily reuse the mobile header from your last application without having to reinvent the wheel!
+For example: <b>Easily reuse the mobile header from your last application without having to reinvent the wheel!</b>
 
 ### Requirements
 
