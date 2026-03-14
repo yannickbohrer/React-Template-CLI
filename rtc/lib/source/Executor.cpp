@@ -206,7 +206,7 @@ void CLI::Executor::GenerateRequiredDirectories() const {
         return;
     int itL = 0, itR = 0;
     std::string lastDir = "";
-    while (itR < m_Path.length()) {
+    while (itR < int(m_Path.length())) {
         if (m_Path.at(itR) == '/') {
             std::string nextDir = m_Path.substr(itL, itR - itL);
             std::filesystem::create_directory(lastDir + nextDir);
